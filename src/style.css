@@ -696,6 +696,104 @@ body {
   border-radius: 2px;
 }
 
+/* ===== HISTORY BUTTON ===== */
+.history-btn {
+  margin-top: 12px;
+  padding: 10px 24px;
+  border: 1px solid rgba(148, 163, 184, 0.3);
+  border-radius: 12px;
+  background: transparent;
+  color: var(--text-dim);
+  font-size: 14px;
+  font-family: var(--font-zh);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.history-btn:active {
+  background: rgba(148, 163, 184, 0.1);
+  color: var(--text);
+}
+
+/* ===== HISTORY SCREEN ===== */
+.history-search {
+  padding: 8px 16px;
+  background: rgba(30, 41, 59, 0.6);
+  border-bottom: 1px solid rgba(148, 163, 184, 0.08);
+}
+
+.history-list {
+  flex: 1;
+  overflow-y: auto;
+  padding: 12px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  -webkit-overflow-scrolling: touch;
+}
+
+.history-empty {
+  margin: auto;
+  text-align: center;
+  color: var(--text-dim);
+  font-size: 16px;
+}
+
+.history-entry {
+  background: var(--bg-card);
+  border-radius: var(--radius-sm);
+  padding: 12px 14px;
+  animation: slideUp 0.2s ease;
+  user-select: text;
+  -webkit-user-select: text;
+}
+
+.history-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+  font-size: 11px;
+  color: var(--text-dim);
+}
+
+.history-role {
+  padding: 2px 8px;
+  border-radius: 8px;
+  font-size: 11px;
+}
+
+.history-role.supervisor {
+  background: rgba(59, 130, 246, 0.2);
+  color: #60a5fa;
+}
+
+.history-role.worker {
+  background: rgba(34, 197, 94, 0.2);
+  color: #4ade80;
+}
+
+.history-original {
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--text);
+  margin-bottom: 6px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.1);
+}
+
+.history-translated {
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--accent);
+}
+
+.history-note {
+  font-size: 11px;
+  color: var(--text-dim);
+  margin-top: 4px;
+}
+
 /* ===== MIC PERMISSION BUTTON ===== */
 .mic-permission-btn {
   margin-top: 24px;

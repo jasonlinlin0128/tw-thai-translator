@@ -26,6 +26,7 @@ import {
     showToast,
 } from './ui.js';
 import { recordRequest, getQuota, canRequest } from './quota.js';
+import { saveEntry, getHistory, clearHistory, formatTime } from './history.js';
 
 let currentRole = null; // 'supervisor' | 'worker'
 let fromLang = 'zh-TW';
@@ -70,6 +71,28 @@ export function initApp() {
             console.error('Mic permission denied:', err);
             showToast('麥克風授權被拒絕，請在瀏覽器設定中允許');
         }
+    });
+
+    // ===== HISTORY =====
+    $('#btn-history').addEventListener('click', () => {
+        renderHistory();
+        showScreen('history-screen');
+    });
+
+    $('#btn-history-back').addEventListener('click', () => {
+        showScreen('role-screen');
+    });
+
+    $('#btn-clear-history').addEventListener('click', () => {
+        if (confirm('確定要清除所有翻譯紀錄？\nล้างประวัติทั้งหมด?')) {
+            clearHistory();
+            renderHistory();
+            showToast('紀錄已清除');
+        }
+    });
+
+    $('#history-search-input').addEventListener('input', (e) => {
+        renderHistory(e.target.value.trim());
     });
 
     // ===== ROLE SELECTION =====
@@ -281,9 +304,11 @@ async function beginRecording() {
             hideLoading();
 
             addTranslationBubble(translation.translated, toLang, translation.note);
+            saveEntry({ role: currentRole, original: selectedValue, translated: translation.translated, fromLang, toLang, note: translation.note });
         } else {
             // Direct translation
             addTranslationBubble(result.translated, toLang, result.note);
+            saveEntry({ role: currentRole, original: text, translated: result.translated, fromLang, toLang, note: result.note });
         }
     } catch (err) {
         hideLoading();
@@ -332,8 +357,10 @@ async function translateText(text) {
             hideLoading();
 
             addTranslationBubble(translation.translated, toLang, translation.note);
+            saveEntry({ role: currentRole, original: selectedValue, translated: translation.translated, fromLang, toLang, note: translation.note });
         } else {
             addTranslationBubble(result.translated, toLang, result.note);
+            saveEntry({ role: currentRole, original: text, translated: result.translated, fromLang, toLang, note: result.note });
         }
     } catch (err) {
         hideLoading();
@@ -342,4 +369,51 @@ async function translateText(text) {
     } finally {
         updateQuotaUI();
     }
+}
+
+// ===== HISTORY RENDERING =====
+function escHtml(str) {
+    const d = document.createElement('div');
+    d.textContent = str || '';
+    return d.innerHTML;
+}
+
+function renderHistory(search = '') {
+    const list = $('#history-list');
+    let entries = getHistory();
+
+    if (search) {
+        const q = search.toLowerCase();
+        entries = entries.filter(
+            (e) =>
+                e.original.toLowerCase().includes(q) ||
+                e.translated.toLowerCase().includes(q)
+        );
+    }
+
+    if (entries.length === 0) {
+        list.innerHTML = `
+            <div class="history-empty">
+                <p>${search ? '找不到結果' : '📝 還沒有翻譯紀錄'}</p>
+                <p class="placeholder-sub">${search ? 'ไม่พบผลลัพธ์' : 'ยังไม่มีประวัติ'}</p>
+            </div>
+        `;
+        return;
+    }
+
+    list.innerHTML = entries
+        .map(
+            (e) => `
+        <div class="history-entry">
+            <div class="history-meta">
+                <span class="history-role ${e.role}">${e.role === 'supervisor' ? '主管' : 'พนักงาน'}</span>
+                <span>${formatTime(e.timestamp)}</span>
+            </div>
+            <div class="history-original">${escHtml(e.original)}</div>
+            <div class="history-translated">${escHtml(e.translated)}</div>
+            ${e.note ? `<div class="history-note">${escHtml(e.note)}</div>` : ''}
+        </div>
+    `
+        )
+        .join('');
 }

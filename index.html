@@ -39,6 +39,37 @@
     <button id="btn-mic-permission" class="mic-permission-btn" style="display:none">
       🎤 允許使用麥克風 / อนุญาตไมโครโฟน
     </button>
+    <button id="btn-history" class="history-btn">
+      📋 翻譯紀錄 / ประวัติ
+    </button>
+  </div>
+
+  <!-- 歷史紀錄畫面 -->
+  <div id="history-screen" class="screen">
+    <header class="top-bar">
+      <button id="btn-history-back" class="icon-btn" aria-label="返回">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+          stroke-linecap="round" stroke-linejoin="round">
+          <path d="M15 18l-6-6 6-6" />
+        </svg>
+      </button>
+      <div class="mode-label">📋 翻譯紀錄</div>
+      <button id="btn-clear-history" class="icon-btn" aria-label="清除" title="清除所有紀錄">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+          stroke-linecap="round" stroke-linejoin="round">
+          <path d="M3 6h18M8 6V4h8v2M5 6v14a2 2 0 002 2h10a2 2 0 002-2V6M10 11v6M14 11v6" />
+        </svg>
+      </button>
+    </header>
+    <div class="history-search">
+      <input id="history-search-input" type="text" placeholder="搜尋紀錄 / ค้นหา..." class="text-input-field" />
+    </div>
+    <div id="history-list" class="history-list">
+      <div class="history-empty">
+        <p>📝 還沒有翻譯紀錄</p>
+        <p class="placeholder-sub">ยังไม่มีประวัติ</p>
+      </div>
+    </div>
   </div>
 
   <!-- 主翻譯畫面 -->
