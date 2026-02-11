@@ -76,9 +76,20 @@
     <div id="chat-area" class="chat-area">
       <div class="chat-placeholder">
         <div class="placeholder-icon">🎤</div>
-        <p>按住下方按鈕開始說話</p>
-        <p class="placeholder-sub">กดปุ่มด้านล่างค้างไว้เพื่อพูด</p>
+        <p>按住下方按鈕開始說話，或輸入文字翻譯</p>
+        <p class="placeholder-sub">กดปุ่มด้านล่างค้างไว้เพื่อพูด หรือพิมพ์ข้อความ</p>
       </div>
+    </div>
+
+    <!-- 文字輸入 -->
+    <div class="text-input-bar">
+      <input id="text-input" type="text" class="text-input-field" placeholder="輸入文字翻譯 / พิมพ์ข้อความ..."
+        autocomplete="off" />
+      <button id="btn-send" class="send-btn" aria-label="送出">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z" />
+        </svg>
+      </button>
     </div>
 
     <!-- 錄音按鈕 -->

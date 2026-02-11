@@ -111,6 +111,29 @@ export function initApp() {
 
     // Prevent context menu on long press
     recordBtn.addEventListener('contextmenu', (e) => e.preventDefault());
+
+    // ===== TEXT INPUT =====
+    const textInput = $('#text-input');
+    const sendBtn = $('#btn-send');
+
+    sendBtn.addEventListener('click', () => {
+        const text = textInput.value.trim();
+        if (text) {
+            textInput.value = '';
+            translateText(text);
+        }
+    });
+
+    textInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' && !e.isComposing) {
+            e.preventDefault();
+            const text = textInput.value.trim();
+            if (text) {
+                textInput.value = '';
+                translateText(text);
+            }
+        }
+    });
 }
 
 // ===== QUOTA UI =====
@@ -246,4 +269,48 @@ async function beginRecording() {
 
 function endRecording() {
     stopListening();
+}
+
+/**
+ * Translate text input (same flow as voice, without STT)
+ */
+async function translateText(text) {
+    // Pre-flight quota check
+    const check = canRequest();
+    if (!check.allowed) {
+        showToast(check.reason);
+        return;
+    }
+
+    // Show original text
+    addSourceBubble(text, fromLang);
+
+    try {
+        showLoading();
+
+        const result = await analyzeAndTranslate(text, fromLang, toLang);
+        recordRequest();
+        updateQuotaUI();
+        hideLoading();
+
+        if (result.type === 'clarify') {
+            const selectedValue = await addClarifyBubble(result);
+
+            showLoading();
+            const translation = await translateClarified(selectedValue, fromLang, toLang);
+            recordRequest();
+            updateQuotaUI();
+            hideLoading();
+
+            addTranslationBubble(translation.translated, toLang, translation.note);
+        } else {
+            addTranslationBubble(result.translated, toLang, result.note);
+        }
+    } catch (err) {
+        hideLoading();
+        console.error('Translation error:', err);
+        showToast(err.message || '發生錯誤');
+    } finally {
+        updateQuotaUI();
+    }
 }
