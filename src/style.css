@@ -696,6 +696,27 @@ body {
   border-radius: 2px;
 }
 
+/* ===== MIC PERMISSION BUTTON ===== */
+.mic-permission-btn {
+  margin-top: 24px;
+  padding: 12px 24px;
+  border: 2px solid var(--accent);
+  border-radius: 12px;
+  background: transparent;
+  color: var(--accent);
+  font-size: 15px;
+  font-family: var(--font-zh);
+  cursor: pointer;
+  transition: all 0.2s;
+  animation: pulse 2s infinite;
+}
+
+.mic-permission-btn:active {
+  background: var(--accent);
+  color: white;
+  transform: scale(0.96);
+}
+
 /* ===== TEXT INPUT BAR ===== */
 .text-input-bar {
   display: flex;

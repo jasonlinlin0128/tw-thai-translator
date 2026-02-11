@@ -43,6 +43,35 @@ export function initApp() {
 
     preloadVoices();
 
+    // ===== MIC PERMISSION =====
+    const micBtn = $('#btn-mic-permission');
+    async function checkMicPermission() {
+        try {
+            const status = await navigator.permissions.query({ name: 'microphone' });
+            micBtn.style.display = status.state === 'granted' ? 'none' : '';
+            status.onchange = () => {
+                micBtn.style.display = status.state === 'granted' ? 'none' : '';
+            };
+        } catch {
+            // Permissions API not supported, show button anyway
+            micBtn.style.display = '';
+        }
+    }
+    checkMicPermission();
+
+    micBtn.addEventListener('click', async () => {
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            // Stop the stream immediately, we just needed the permission
+            stream.getTracks().forEach((t) => t.stop());
+            micBtn.style.display = 'none';
+            showToast('✅ 麥克風已授權');
+        } catch (err) {
+            console.error('Mic permission denied:', err);
+            showToast('麥克風授權被拒絕，請在瀏覽器設定中允許');
+        }
+    });
+
     // ===== ROLE SELECTION =====
     document.querySelectorAll('.role-card').forEach((card) => {
         card.addEventListener('click', () => {
