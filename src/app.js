@@ -10,7 +10,6 @@ import {
 } from './speech.js';
 import {
     getApiKey,
-    setApiKey,
     analyzeAndTranslate,
     translateClarified,
 } from './gemini.js';
@@ -24,7 +23,6 @@ import {
     showLoading,
     hideLoading,
     setRecordStatus,
-    showSettings,
     showToast,
 } from './ui.js';
 import { recordRequest, getQuota, canRequest } from './quota.js';
@@ -44,12 +42,6 @@ export function initApp() {
     }
 
     preloadVoices();
-
-    // Pre-fill API key (if saved)
-    const savedKey = getApiKey();
-    if (savedKey) {
-        $('#api-key-input').value = savedKey;
-    }
 
     // ===== ROLE SELECTION =====
     document.querySelectorAll('.role-card').forEach((card) => {
@@ -79,27 +71,6 @@ export function initApp() {
         }
         stopQuotaRefresh();
         showScreen('role-screen');
-    });
-
-    // ===== SETTINGS =====
-    $('#btn-settings').addEventListener('click', () => {
-        $('#api-key-input').value = getApiKey();
-        showSettings(true);
-    });
-
-    $('#btn-cancel-settings').addEventListener('click', () => {
-        showSettings(false);
-    });
-
-    $('#btn-save-settings').addEventListener('click', () => {
-        const key = $('#api-key-input').value.trim();
-        if (key) {
-            setApiKey(key);
-            showSettings(false);
-            showToast('✅ API Key 已儲存');
-        } else {
-            showToast('請輸入有效的 API Key');
-        }
     });
 
     // ===== RECORD BUTTON =====
