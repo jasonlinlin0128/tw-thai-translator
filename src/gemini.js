@@ -59,64 +59,15 @@ async function fetchWithRetry(url, options, maxRetries = 1) {
  * Build the system prompt for translation
  */
 function buildSystemPrompt(fromLang, toLang) {
-    const fromName = fromLang === 'zh-TW' ? '中文' : 'ภาษาไทย';
-    const toName = toLang === 'zh-TW' ? '中文' : 'ภาษาไทย';
+    const fromName = fromLang === 'zh-TW' ? '中文' : 'ไทย';
+    const toName = toLang === 'zh-TW' ? '中文' : 'ไทย';
 
-    return `你是一個工廠環境的專業翻譯助手，負責協助主管與泰國籍同仁之間的溝通。
-
-你的首要任務是「確保溝通的精準性」。工廠環境中的指令如果誤解，可能造成安全問題或生產問題。
-
-## 判斷流程
-
-**步驟一：分析語意是否模糊**
-以下情況視為模糊，必須反問確認：
-- 使用代詞但沒有明確對象：「那個」「這個」「那邊」「它」
-- 動作描述不具體：「弄一下」「處理一下」「轉一下」「用一下」「調一下」
-- 缺少關鍵資訊：沒說是哪台機器、哪個零件、哪個位置
-- 方向或位置模糊：「放過去」「搬過來」沒有指明方向
-
-**步驟二：根據分析結果回應**
-- 模糊 → 用${fromName}提出釐清問題，提供 2-4 個選項
-- 清晰 → 直接翻譯成${toName}
-
-## 模糊的例子（必須反問）
-- 「那個東西轉一下」→ 反問：轉什麼？零件？開關？旋鈕？
-- 「那邊弄一下」→ 反問：弄什麼？清潔？整理？修理？
-- 「幫我拿那個」→ 反問：拿什麼？工具？零件？材料？
-- 「這個處理一下」→ 反問：怎麼處理？丟掉？清洗？送修？
-
-## 清晰的例子（直接翻譯）
-- 「請把螺絲鎖緊」→ 直接翻譯
-- 「去倉庫拿 10 號扳手」→ 直接翻譯
-- 「今天需要加班到 8 點」→ 直接翻譯
-
-## 回覆格式（純 JSON）
-
-語意清晰時：
-{
-  "type": "translate",
-  "original": "原文",
-  "translated": "翻譯結果",
-  "note": "可選的翻譯備註"
-}
-
-語意模糊時：
-{
-  "type": "clarify",
-  "question_source": "用${fromName}寫的釐清問題",
-  "question_target": "用${toName}寫的同一個問題",
-  "options": [
-    {
-      "source": "選項（${fromName}）",
-      "target": "選項（${toName}）",
-      "value": "用於後續翻譯的完整明確句子"
-    }
-  ]
-}
-
-## 翻譯規則
-- 用簡單易懂的口語，不要太正式
-- 工廠常見指令：操作機台、搬運、組裝、品檢、換線、清潔等`;
+    return `工廠翻譯助手。${fromName}→${toName}。口語化翻譯。
+若語意模糊（代詞不明、動作不具體如「弄一下」「那個」），用clarify格式反問。
+若語意清晰，用translate格式直接翻譯。
+回JSON：
+清晰：{"type":"translate","original":"原文","translated":"譯文"}
+模糊：{"type":"clarify","question_source":"${fromName}問題","question_target":"${toName}問題","options":[{"source":"選項${fromName}","target":"選項${toName}","value":"明確句子"}]}`;
 }
 
 /**
@@ -197,19 +148,10 @@ export async function translateClarified(clarifiedText, fromLang, toLang) {
         throw new Error('請先設定 Gemini API Key');
     }
 
-    const fromName = fromLang === 'zh-TW' ? '中文' : 'ภาษาไทย';
-    const toName = toLang === 'zh-TW' ? '中文' : 'ภาษาไทย';
+    const fromName = fromLang === 'zh-TW' ? '中文' : 'ไทย';
+    const toName = toLang === 'zh-TW' ? '中文' : 'ไทย';
 
-    const prompt = `將以下工廠指令從${fromName}翻譯成${toName}，用簡單口語表達。
-
-只回覆 JSON：
-{
-  "type": "translate",
-  "original": "原文",
-  "translated": "翻譯結果"
-}
-
-原文：${clarifiedText}`;
+    const prompt = `${fromName}→${toName}口語翻譯，回JSON{"type":"translate","original":"原文","translated":"譯文"}：${clarifiedText}`;
 
     const response = await fetchWithRetry(`${GEMINI_API_URL}?key=${apiKey}`, {
         method: 'POST',
