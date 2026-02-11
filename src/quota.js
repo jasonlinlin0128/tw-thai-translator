@@ -1,17 +1,17 @@
 /**
  * API usage quota tracker (client-side)
  *
- * Gemini 2.0 Flash Lite free tier:
- * - 30 RPM (requests per minute)
- * - 1,500 RPD (requests per day)
+ * Gemini 2.5 Flash free tier:
+ * - 10 RPM (requests per minute)
+ * - 500 RPD (requests per day)
  *
  * We track usage locally and show remaining quota on UI.
  * Note: if the user clears localStorage, counts reset (conservative approach).
  */
 
 const STORAGE_KEY = 'gemini_usage';
-const MAX_RPM = 30;
-const MAX_RPD = 1500;
+const MAX_RPM = 10;
+const MAX_RPD = 500;
 
 function getUsageData() {
     try {
@@ -114,7 +114,7 @@ export function getQuota() {
 export function canRequest() {
     const q = getQuota();
     if (q.rpd.remaining <= 0) {
-        return { allowed: false, reason: '今日 API 額度已用完（1,500次/天），明天重置' };
+        return { allowed: false, reason: '今日 API 額度已用完（500次/天），明天重置' };
     }
     if (q.rpm.remaining <= 0) {
         return { allowed: false, reason: `每分鐘額度已滿，${q.rpm.resetInSec} 秒後可用` };

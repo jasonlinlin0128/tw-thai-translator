@@ -25,14 +25,28 @@ export function setApiKey(key) {
 /**
  * Fetch with retry + exponential backoff for 429 errors
  */
-async function fetchWithRetry(url, options, maxRetries = 3) {
+async function fetchWithRetry(url, options, maxRetries = 1) {
     for (let attempt = 0; attempt <= maxRetries; attempt++) {
         const response = await fetch(url, options);
 
         if (response.status === 429 && attempt < maxRetries) {
-            const waitMs = Math.pow(2, attempt) * 2000; // 2s, 4s, 8s
             const body = await response.clone().text();
-            console.warn(`429 rate limit (attempt ${attempt + 1}/${maxRetries}), body:`, body, `retrying in ${waitMs}ms`);
+            console.warn(`429 rate limit (attempt ${attempt + 1}/${maxRetries}), body:`, body);
+
+            // Try to parse retryDelay from API response
+            let waitMs = 10000; // default 10s
+            try {
+                const errJson = JSON.parse(body);
+                const retryInfo = errJson.error?.details?.find(
+                    (d) => d['@type']?.includes('RetryInfo')
+                );
+                if (retryInfo?.retryDelay) {
+                    const sec = parseFloat(retryInfo.retryDelay);
+                    if (!isNaN(sec)) waitMs = Math.ceil(sec * 1000) + 500;
+                }
+            } catch { /* use default */ }
+
+            console.warn(`Retrying in ${waitMs}ms`);
             await new Promise((r) => setTimeout(r, waitMs));
             continue;
         }
