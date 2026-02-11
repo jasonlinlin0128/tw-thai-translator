@@ -29,36 +29,49 @@ export function startListening(lang) {
             return;
         }
 
+        // Always create a fresh instance to avoid stale state
+        if (recognition) {
+            try { recognition.abort(); } catch (e) { /* ignore */ }
+            recognition = null;
+        }
+
         recognition = new SpeechRecognition();
         recognition.lang = lang;
         recognition.interimResults = false;
-        recognition.continuous = false;
+        recognition.continuous = true; // Keep listening until user releases
         recognition.maxAlternatives = 1;
 
-        let resultText = '';
+        let segments = []; // Accumulate all recognized segments
 
         recognition.onresult = (event) => {
-            resultText = event.results[0][0].transcript;
+            // Collect all new final results
+            for (let i = event.resultIndex; i < event.results.length; i++) {
+                if (event.results[i].isFinal) {
+                    segments.push(event.results[i][0].transcript);
+                }
+            }
+            console.log('STT segments so far:', segments);
         };
 
         recognition.onerror = (event) => {
+            console.warn('STT error:', event.error);
             isListening = false;
-            if (event.error === 'no-speech') {
-                resolve('');
-            } else if (event.error === 'aborted') {
-                resolve(resultText);
+            if (event.error === 'no-speech' || event.error === 'aborted') {
+                resolve(segments.join(''));
             } else {
                 reject(new Error(`語音辨識錯誤: ${event.error}`));
             }
         };
 
         recognition.onend = () => {
+            console.log('STT ended, segments:', segments);
             isListening = false;
-            resolve(resultText);
+            resolve(segments.join(''));
         };
 
         isListening = true;
         recognition.start();
+        console.log('STT started, lang:', lang);
     });
 }
 
@@ -66,8 +79,12 @@ export function startListening(lang) {
  * Stop listening
  */
 export function stopListening() {
-    if (recognition && isListening) {
-        recognition.stop();
+    if (recognition) {
+        try {
+            recognition.stop();
+        } catch (e) {
+            console.warn('stopListening error:', e);
+        }
     }
 }
 
