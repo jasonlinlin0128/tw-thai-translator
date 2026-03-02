@@ -68,7 +68,7 @@ export function addSourceBubble(text, lang) {
 /**
  * Add a translation result bubble
  */
-export function addTranslationBubble(text, lang, note) {
+export function addTranslationBubble(text, lang, note, gender = 'male') {
     const chatArea = $('#chat-area');
     const labelText = lang === 'zh-TW' ? '中文翻譯' : 'คำแปลภาษาไทย';
 
@@ -87,7 +87,7 @@ export function addTranslationBubble(text, lang, note) {
   `;
 
     div.querySelector('.play-btn').addEventListener('click', () => {
-        speak(text, lang);
+        speak(text, lang, gender);
     });
 
     div.querySelector('.copy-btn').addEventListener('click', async () => {
@@ -103,7 +103,7 @@ export function addTranslationBubble(text, lang, note) {
     scrollToBottom();
 
     // Auto-play
-    speak(text, lang);
+    speak(text, lang, gender);
 }
 
 /**

@@ -80,11 +80,14 @@ function extractJSON(text) {
 /**
  * Build the system prompt for translation
  */
-function buildSystemPrompt(fromLang, toLang) {
+function buildSystemPrompt(fromLang, toLang, gender = 'male') {
     const fromName = fromLang === 'zh-TW' ? '中文' : 'ไทย';
     const toName = toLang === 'zh-TW' ? '中文' : 'ไทย';
+    const genderHint = gender === 'female'
+        ? '說話者是女性，泰文句尾用ค่ะ(陳述)/คะ(疑問)，不要用ครับ。'
+        : '說話者是男性，泰文句尾用ครับ，不要用ค่ะ/คะ。';
 
-    return `工廠翻譯助手。${fromName}→${toName}。口語化翻譯。
+    return `工廠翻譯助手。${fromName}→${toName}。口語化翻譯。${genderHint}
 術語表：安全帽=หมวกนิรภัย,手套=ถุงมือ,護目鏡=แว่นตานิรภัย,停機=หยุดเครื่อง,開機=เปิดเครื่อง,模具=แม่พิมพ์,良品=ของดี,不良品=ของเสีย,品檢=QC,加班=OT/ทำโอที,上班=เข้างาน,下班=เลิกงาน,倉庫=คลังสินค้า,出貨=ส่งของ,原料=วัตถุดิบ,組裝=ประกอบ,焊接=เชื่อม,研磨=เจียร,沖壓=ปั๊ม
 若語意模糊（代詞不明、動作不具體如「弄一下」「那個」），用clarify格式反問。
 若語意清晰，用translate格式直接翻譯。
@@ -100,13 +103,13 @@ function buildSystemPrompt(fromLang, toLang) {
  * @param {'zh-TW' | 'th-TH'} toLang
  * @returns {Promise<Object>} result with type 'translate' or 'clarify'
  */
-export async function analyzeAndTranslate(text, fromLang, toLang) {
+export async function analyzeAndTranslate(text, fromLang, toLang, gender = 'male') {
     const apiKey = getApiKey();
     if (!apiKey) {
         throw new Error('請先設定 Gemini API Key');
     }
 
-    const systemPrompt = buildSystemPrompt(fromLang, toLang);
+    const systemPrompt = buildSystemPrompt(fromLang, toLang, gender);
 
     const response = await fetchWithRetry(`${GEMINI_API_URL}?key=${apiKey}`, {
         method: 'POST',
@@ -164,7 +167,7 @@ export async function analyzeAndTranslate(text, fromLang, toLang) {
  * @param {'zh-TW' | 'th-TH'} toLang
  * @returns {Promise<Object>}
  */
-export async function translateClarified(clarifiedText, fromLang, toLang) {
+export async function translateClarified(clarifiedText, fromLang, toLang, gender = 'male') {
     const apiKey = getApiKey();
     if (!apiKey) {
         throw new Error('請先設定 Gemini API Key');
@@ -172,8 +175,9 @@ export async function translateClarified(clarifiedText, fromLang, toLang) {
 
     const fromName = fromLang === 'zh-TW' ? '中文' : 'ไทย';
     const toName = toLang === 'zh-TW' ? '中文' : 'ไทย';
+    const genderNote = gender === 'female' ? '，句尾用ค่ะ/คะ' : '，句尾用ครับ';
 
-    const prompt = `${fromName}→${toName}口語翻譯，只回JSON不要markdown：{"type":"translate","original":"原文","translated":"譯文"}：${clarifiedText}`;
+    const prompt = `${fromName}→${toName}口語翻譯${genderNote}，只回JSON不要markdown：{"type":"translate","original":"原文","translated":"譯文"}：${clarifiedText}`;
 
     const response = await fetchWithRetry(`${GEMINI_API_URL}?key=${apiKey}`, {
         method: 'POST',

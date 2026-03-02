@@ -94,7 +94,7 @@ export function stopListening() {
  * @param {'zh-TW' | 'th-TH'} lang
  * @returns {Promise<void>}
  */
-export function speak(text, lang) {
+export function speak(text, lang, gender = 'male') {
     return new Promise((resolve) => {
         if (!window.speechSynthesis) {
             console.warn('TTS not supported');
@@ -113,13 +113,23 @@ export function speak(text, lang) {
             utterance.pitch = 1;
             utterance.volume = 1;
 
-            // Find a matching voice
+            // Find a matching voice, preferring requested gender
             const voices = window.speechSynthesis.getVoices();
-            console.log('Available voices:', voices.length, 'Looking for:', lang);
+            console.log('Available voices:', voices.length, 'Looking for:', lang, gender);
             const langPrefix = lang.split('-')[0];
-            const matchedVoice = voices.find(
+            const langVoices = voices.filter(
                 (v) => v.lang === lang || v.lang.startsWith(langPrefix)
             );
+
+            // Try to match gender by voice name heuristics
+            const genderKeywords = gender === 'female'
+                ? ['female', 'woman', 'girl', 'หญิง', '女']
+                : ['male', 'man', 'boy', 'ชาย', '男'];
+            const genderMatch = langVoices.find((v) =>
+                genderKeywords.some((kw) => v.name.toLowerCase().includes(kw))
+            );
+
+            const matchedVoice = genderMatch || langVoices[0] || null;
             if (matchedVoice) {
                 utterance.voice = matchedVoice;
                 console.log('Using voice:', matchedVoice.name, matchedVoice.lang);

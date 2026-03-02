@@ -30,6 +30,7 @@ import { saveEntry, getHistory, clearHistory, formatTime } from './history.js';
 import { logTranslation, getSheetUrl, setSheetUrl } from './logger.js';
 
 let currentRole = null; // 'supervisor' | 'worker'
+let currentGender = localStorage.getItem('voice_gender') || 'male'; // 'male' | 'female'
 let fromLang = 'zh-TW';
 let toLang = 'th-TH';
 let isRecording = false;
@@ -86,6 +87,18 @@ export function initApp() {
             console.error('Mic permission denied:', err);
             showToast('麥克風授權被拒絕，請在瀏覽器設定中允許');
         }
+    });
+
+    // ===== GENDER SELECT =====
+    const genderBtns = document.querySelectorAll('.gender-btn');
+    // Restore saved gender
+    genderBtns.forEach((btn) => {
+        btn.classList.toggle('active', btn.dataset.gender === currentGender);
+        btn.addEventListener('click', () => {
+            currentGender = btn.dataset.gender;
+            localStorage.setItem('voice_gender', currentGender);
+            genderBtns.forEach((b) => b.classList.toggle('active', b === btn));
+        });
     });
 
     // ===== HISTORY =====
@@ -409,7 +422,7 @@ async function beginRecording() {
         setRecordStatus('翻譯中...');
 
         // Send to Gemini
-        const result = await analyzeAndTranslate(text, fromLang, toLang);
+        const result = await analyzeAndTranslate(text, fromLang, toLang, currentGender);
         recordRequest();
         updateQuotaUI();
         hideLoading();
@@ -421,17 +434,17 @@ async function beginRecording() {
             // Translate the selected option
             showLoading();
             setRecordStatus('翻譯中...');
-            const translation = await translateClarified(selectedValue, fromLang, toLang);
+            const translation = await translateClarified(selectedValue, fromLang, toLang, currentGender);
             recordRequest();
             updateQuotaUI();
             hideLoading();
 
-            addTranslationBubble(translation.translated, toLang, translation.note);
+            addTranslationBubble(translation.translated, toLang, translation.note, currentGender);
             saveEntry({ role: currentRole, original: selectedValue, translated: translation.translated, fromLang, toLang, note: translation.note });
             logTranslation({ role: currentRole, original: selectedValue, translated: translation.translated, fromLang, toLang, type: 'clarify', note: translation.note });
         } else {
             // Direct translation
-            addTranslationBubble(result.translated, toLang, result.note);
+            addTranslationBubble(result.translated, toLang, result.note, currentGender);
             saveEntry({ role: currentRole, original: text, translated: result.translated, fromLang, toLang, note: result.note });
             logTranslation({ role: currentRole, original: text, translated: result.translated, fromLang, toLang, type: 'translate', note: result.note });
         }
@@ -467,7 +480,7 @@ async function translateText(text) {
     try {
         showLoading();
 
-        const result = await analyzeAndTranslate(text, fromLang, toLang);
+        const result = await analyzeAndTranslate(text, fromLang, toLang, currentGender);
         recordRequest();
         updateQuotaUI();
         hideLoading();
@@ -476,16 +489,16 @@ async function translateText(text) {
             const selectedValue = await addClarifyBubble(result);
 
             showLoading();
-            const translation = await translateClarified(selectedValue, fromLang, toLang);
+            const translation = await translateClarified(selectedValue, fromLang, toLang, currentGender);
             recordRequest();
             updateQuotaUI();
             hideLoading();
 
-            addTranslationBubble(translation.translated, toLang, translation.note);
+            addTranslationBubble(translation.translated, toLang, translation.note, currentGender);
             saveEntry({ role: currentRole, original: selectedValue, translated: translation.translated, fromLang, toLang, note: translation.note });
             logTranslation({ role: currentRole, original: selectedValue, translated: translation.translated, fromLang, toLang, type: 'clarify', note: translation.note });
         } else {
-            addTranslationBubble(result.translated, toLang, result.note);
+            addTranslationBubble(result.translated, toLang, result.note, currentGender);
             saveEntry({ role: currentRole, original: text, translated: result.translated, fromLang, toLang, note: result.note });
             logTranslation({ role: currentRole, original: text, translated: result.translated, fromLang, toLang, type: 'translate', note: result.note });
         }

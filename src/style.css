@@ -176,6 +176,47 @@ body {
   margin-top: 8px;
 }
 
+/* Gender select */
+.gender-select {
+  text-align: center;
+  width: 100%;
+  max-width: 400px;
+}
+
+.gender-label {
+  font-size: 13px;
+  color: var(--text-dim);
+  display: block;
+  margin-bottom: 8px;
+}
+
+.gender-buttons {
+  display: flex;
+  gap: 8px;
+}
+
+.gender-btn {
+  flex: 1;
+  padding: 10px;
+  background: var(--bg-card);
+  border: 2px solid transparent;
+  border-radius: var(--radius-sm);
+  color: var(--text);
+  font-size: 15px;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.gender-btn.active {
+  border-color: var(--accent);
+  background: rgba(59, 130, 246, 0.15);
+}
+
+.gender-btn:not(.active):hover {
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
 .role-cards {
   display: flex;
   gap: 20px;
