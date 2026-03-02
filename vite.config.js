@@ -13,6 +13,8 @@ export default defineConfig({
         description: '中文 ↔ 泰文 即時語音翻譯',
         theme_color: '#0f172a',
         background_color: '#0f172a',
+        start_url: '/tw-thai-translator/',
+        scope: '/tw-thai-translator/',
         display: 'standalone',
         orientation: 'portrait',
         icons: [
