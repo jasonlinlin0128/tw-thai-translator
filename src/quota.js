@@ -121,7 +121,7 @@ export function resetQuota() {
 export function canRequest() {
     const q = getQuota();
     if (q.rpd.remaining <= 0) {
-        return { allowed: false, reason: '今日 API 額度已用完（1,500次/天），明天重置' };
+        return { allowed: false, reason: '今日 API 額度已用完（250次/天），明天重置' };
     }
     if (q.rpm.remaining <= 0) {
         return { allowed: false, reason: `每分鐘額度已滿，${q.rpm.resetInSec} 秒後可用` };
