@@ -372,23 +372,37 @@ body {
   letter-spacing: 0.5px;
 }
 
-.play-btn {
-  background: rgba(255, 255, 255, 0.1);
+/* Translation result - large text for showing to others */
+.translation-text {
+  font-size: 22px;
+  font-weight: 500;
+  line-height: 1.5;
+}
+
+.bubble-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.action-btn {
+  background: rgba(255, 255, 255, 0.15);
   border: none;
   color: var(--text);
-  padding: 6px 12px;
-  border-radius: 20px;
-  font-size: 13px;
+  padding: 10px 18px;
+  border-radius: 24px;
+  font-size: 15px;
   cursor: pointer;
-  margin-top: 8px;
   transition: background 0.2s;
   display: inline-flex;
   align-items: center;
-  gap: 4px;
+  gap: 6px;
+  flex: 1;
+  justify-content: center;
 }
 
-.play-btn:hover {
-  background: rgba(255, 255, 255, 0.2);
+.action-btn:active {
+  background: rgba(255, 255, 255, 0.3);
 }
 
 /* Clarify bubble */
@@ -829,6 +843,46 @@ body {
   background: var(--accent);
   color: white;
   transform: scale(0.96);
+}
+
+/* ===== QUICK PHRASES ===== */
+.quick-phrases {
+  background: rgba(30, 41, 59, 0.6);
+  border-top: 1px solid rgba(148, 163, 184, 0.08);
+  padding: 8px 0;
+}
+
+.quick-phrases-scroll {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding: 0 12px;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+
+.quick-phrases-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+.quick-phrase-btn {
+  flex-shrink: 0;
+  padding: 8px 16px;
+  border-radius: 20px;
+  border: 1px solid rgba(148, 163, 184, 0.25);
+  background: rgba(59, 130, 246, 0.1);
+  color: var(--text);
+  font-size: 14px;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.quick-phrase-btn:active {
+  background: var(--accent);
+  border-color: var(--accent);
+  transform: scale(0.95);
 }
 
 /* ===== TEXT INPUT BAR ===== */

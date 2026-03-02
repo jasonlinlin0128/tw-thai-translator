@@ -36,6 +36,20 @@ let quotaTimer = null;
 
 const $ = (sel) => document.querySelector(sel);
 
+// Common factory phrases per role
+const QUICK_PHRASES = {
+    supervisor: [
+        '戴安全帽', '小心燙', '停機', '開機',
+        '快一點', '休息', '加班', '注意安全',
+        '這個不對', '再做一次', '很好', '下班',
+    ],
+    worker: [
+        'เข้าใจแล้ว', 'ไม่เข้าใจ', 'ช่วยด้วย', 'เสร็จแล้ว',
+        'มีปัญหา', 'ขอพัก', 'เครื่องเสีย', 'ต้องการอะไหล่',
+        'รับทราบ', 'รอสักครู่', 'ทำไม่ได้', 'ขอบคุณ',
+    ],
+};
+
 export function initApp() {
     // Check speech support
     if (!isSpeechSupported()) {
@@ -115,6 +129,7 @@ export function initApp() {
             }
             setModeLabel(currentRole);
             clearChat();
+            renderQuickPhrases(currentRole);
             showScreen('translate-screen');
             updateRecordStatus();
             startQuotaRefresh();
@@ -376,6 +391,30 @@ async function translateText(text) {
     } finally {
         updateQuotaUI();
     }
+}
+
+// ===== QUICK PHRASES =====
+function renderQuickPhrases(role) {
+    const container = $('#quick-phrases');
+    const scroll = container.querySelector('.quick-phrases-scroll');
+    const phrases = QUICK_PHRASES[role] || [];
+
+    if (phrases.length === 0) {
+        container.style.display = 'none';
+        return;
+    }
+
+    scroll.innerHTML = phrases
+        .map((p) => `<button class="quick-phrase-btn">${escHtml(p)}</button>`)
+        .join('');
+
+    scroll.querySelectorAll('.quick-phrase-btn').forEach((btn) => {
+        btn.addEventListener('click', () => {
+            translateText(btn.textContent);
+        });
+    });
+
+    container.style.display = '';
 }
 
 // ===== HISTORY RENDERING =====

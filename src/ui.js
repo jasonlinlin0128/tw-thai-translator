@@ -76,16 +76,27 @@ export function addTranslationBubble(text, lang, note) {
     div.className = 'chat-msg target';
     div.innerHTML = `
     <div class="bubble-label">${labelText}</div>
-    <div class="bubble">
-      ${escapeHtml(text)}
+    <div class="bubble translation-bubble">
+      <div class="translation-text">${escapeHtml(text)}</div>
       ${note ? `<div style="font-size:12px;opacity:0.7;margin-top:6px;">${escapeHtml(note)}</div>` : ''}
-      <button class="play-btn" data-text="${escapeAttr(text)}" data-lang="${lang}">🔊 播放</button>
+      <div class="bubble-actions">
+        <button class="action-btn play-btn" data-text="${escapeAttr(text)}" data-lang="${lang}">🔊 播放</button>
+        <button class="action-btn copy-btn">📋 複製</button>
+      </div>
     </div>
   `;
 
-    const playBtn = div.querySelector('.play-btn');
-    playBtn.addEventListener('click', () => {
+    div.querySelector('.play-btn').addEventListener('click', () => {
         speak(text, lang);
+    });
+
+    div.querySelector('.copy-btn').addEventListener('click', async () => {
+        try {
+            await navigator.clipboard.writeText(text);
+            showToast('已複製到剪貼簿');
+        } catch {
+            showToast('複製失敗');
+        }
     });
 
     chatArea.appendChild(div);
