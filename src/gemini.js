@@ -1,5 +1,9 @@
 /**
  * Gemini API integration for semantic understanding + translation
+ *
+ * NOTE: gemini-2.5-flash with responseMimeType:"application/json" corrupts
+ * non-Latin characters (Chinese/Thai). We use plain text mode + thinkingBudget
+ * to keep responses fast (~2s) and correct.
  */
 
 const GEMINI_API_URL =
@@ -56,6 +60,24 @@ async function fetchWithRetry(url, options, maxRetries = 3) {
 }
 
 /**
+ * Extract JSON from model response text (may be wrapped in ```json code fence)
+ */
+function extractJSON(text) {
+    // Try direct parse first
+    try {
+        return JSON.parse(text);
+    } catch { /* continue */ }
+
+    // Try extracting from ```json ... ``` code fence
+    const fenceMatch = text.match(/```(?:json)?\s*([\s\S]*?)```/);
+    if (fenceMatch) {
+        return JSON.parse(fenceMatch[1].trim());
+    }
+
+    throw new Error('無法解析回傳的 JSON');
+}
+
+/**
  * Build the system prompt for translation
  */
 function buildSystemPrompt(fromLang, toLang) {
@@ -65,7 +87,7 @@ function buildSystemPrompt(fromLang, toLang) {
     return `工廠翻譯助手。${fromName}→${toName}。口語化翻譯。
 若語意模糊（代詞不明、動作不具體如「弄一下」「那個」），用clarify格式反問。
 若語意清晰，用translate格式直接翻譯。
-回JSON：
+只回JSON，不要markdown或code fence：
 清晰：{"type":"translate","original":"原文","translated":"譯文"}
 模糊：{"type":"clarify","question_source":"${fromName}問題","question_target":"${toName}問題","options":[{"source":"選項${fromName}","target":"選項${toName}","value":"明確句子"}]}`;
 }
@@ -100,7 +122,7 @@ export async function analyzeAndTranslate(text, fromLang, toLang) {
             ],
             generationConfig: {
                 temperature: 0.3,
-                responseMimeType: 'application/json',
+                thinkingConfig: { thinkingBudget: 256 },
             },
         }),
     });
@@ -116,7 +138,7 @@ export async function analyzeAndTranslate(text, fromLang, toLang) {
             detail = errBody;
         }
         if (response.status === 429) {
-            throw new Error(`API 限流（已重試 ${maxRetries} 次仍失敗）：伺服器拒絕請求，可能是 API Key 額度已用盡或被多人共用。建議等幾分鐘或更換 API Key。`);
+            throw new Error(`API 限流（已重試 3 次仍失敗）：伺服器拒絕請求，可能是 API Key 額度已用盡或被多人共用。建議等幾分鐘或更換 API Key。`);
         }
         if (response.status === 403) {
             throw new Error('API Key 無效或已過期，請到設定更換 API Key');
@@ -131,11 +153,7 @@ export async function analyzeAndTranslate(text, fromLang, toLang) {
         throw new Error('Gemini 沒有回傳有效內容');
     }
 
-    try {
-        return JSON.parse(content);
-    } catch {
-        throw new Error('Gemini 回傳格式錯誤');
-    }
+    return extractJSON(content);
 }
 
 /**
@@ -154,7 +172,7 @@ export async function translateClarified(clarifiedText, fromLang, toLang) {
     const fromName = fromLang === 'zh-TW' ? '中文' : 'ไทย';
     const toName = toLang === 'zh-TW' ? '中文' : 'ไทย';
 
-    const prompt = `${fromName}→${toName}口語翻譯，回JSON{"type":"translate","original":"原文","translated":"譯文"}：${clarifiedText}`;
+    const prompt = `${fromName}→${toName}口語翻譯，只回JSON不要markdown：{"type":"translate","original":"原文","translated":"譯文"}：${clarifiedText}`;
 
     const response = await fetchWithRetry(`${GEMINI_API_URL}?key=${apiKey}`, {
         method: 'POST',
@@ -163,7 +181,7 @@ export async function translateClarified(clarifiedText, fromLang, toLang) {
             contents: [{ role: 'user', parts: [{ text: prompt }] }],
             generationConfig: {
                 temperature: 0.2,
-                responseMimeType: 'application/json',
+                thinkingConfig: { thinkingBudget: 256 },
             },
         }),
     });
@@ -191,7 +209,7 @@ export async function translateClarified(clarifiedText, fromLang, toLang) {
     const content = data.candidates?.[0]?.content?.parts?.[0]?.text;
 
     try {
-        return JSON.parse(content);
+        return extractJSON(content);
     } catch {
         // Fallback: return raw text as translation
         return {
