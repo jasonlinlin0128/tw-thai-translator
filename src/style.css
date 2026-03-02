@@ -119,11 +119,23 @@ body {
 
 /* ===== ROLE SELECTION ===== */
 #role-screen {
-  justify-content: center;
+  justify-content: flex-start;
   align-items: center;
-  gap: 48px;
-  padding: 32px;
+  gap: 36px;
+  padding: 32px 32px calc(32px + env(safe-area-inset-bottom, 0px));
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
   background: linear-gradient(160deg, #0f172a 0%, #1e1b4b 50%, #0f172a 100%);
+}
+
+/* 內容少時垂直置中，多時從頂部開始 */
+#role-screen::before {
+  content: '';
+  flex: 1;
+}
+#role-screen::after {
+  content: '';
+  flex: 1;
 }
 
 .role-header {
