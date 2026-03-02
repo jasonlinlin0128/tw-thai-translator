@@ -1,17 +1,17 @@
 /**
  * API usage quota tracker (client-side)
  *
- * Gemini 2.0 Flash free tier:
- * - 15 RPM (requests per minute)
- * - 1,500 RPD (requests per day)
+ * Gemini 2.0 Flash free tier (updated 2025-12):
+ * - 10 RPM (requests per minute)
+ * - 250 RPD (requests per day)
  *
  * We track usage locally and show remaining quota on UI.
  * Note: if the user clears localStorage, counts reset (conservative approach).
  */
 
 const STORAGE_KEY = 'gemini_usage';
-const MAX_RPM = 15;
-const MAX_RPD = 1500;
+const MAX_RPM = 10;
+const MAX_RPD = 250;
 
 function getUsageData() {
     try {
