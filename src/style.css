@@ -24,6 +24,73 @@
   --font-th: 'Noto Sans Thai', sans-serif;
 }
 
+/* Light theme */
+body.light {
+  --bg: #f1f5f9;
+  --bg-card: #ffffff;
+  --bg-bubble-src: #e2e8f0;
+  --bg-bubble-tgt: #3b82f6;
+  --bg-clarify: #8b5cf6;
+  --text: #1e293b;
+  --text-dim: #64748b;
+  --accent: #2563eb;
+  --accent-glow: rgba(37, 99, 235, 0.3);
+}
+
+body.light #role-screen {
+  background: linear-gradient(160deg, #e0e7ff 0%, #f1f5f9 50%, #e0e7ff 100%);
+}
+
+body.light .top-bar {
+  background: rgba(241, 245, 249, 0.9);
+  border-bottom-color: rgba(100, 116, 139, 0.15);
+}
+
+body.light .quota-bar,
+body.light .quick-phrases,
+body.light .text-input-bar {
+  background: rgba(255, 255, 255, 0.8);
+}
+
+body.light .record-area {
+  background: rgba(241, 245, 249, 0.95);
+}
+
+body.light .record-btn {
+  box-shadow: 0 4px 24px rgba(37, 99, 235, 0.3);
+}
+
+body.light .quota-toggle,
+body.light .reset-quota-btn {
+  color: var(--text-dim);
+}
+
+body.light .reset-quota-btn {
+  border-color: rgba(0, 0, 0, 0.1);
+}
+
+body.light .quick-phrase-btn {
+  border-color: rgba(0, 0, 0, 0.1);
+  background: rgba(37, 99, 235, 0.08);
+}
+
+body.light .action-btn {
+  background: rgba(0, 0, 0, 0.08);
+  color: var(--text);
+}
+
+body.light .loading-dots {
+  background: var(--bg-card);
+}
+
+body.light .source .bubble {
+  color: var(--text);
+}
+
+body.light .toast {
+  background: #dc2626;
+}
+
 html,
 body {
   height: 100%;
@@ -187,15 +254,62 @@ body {
   color: var(--text-dim);
 }
 
+/* ===== OFFLINE BANNER ===== */
+.offline-banner {
+  background: #dc2626;
+  color: white;
+  text-align: center;
+  padding: 8px 16px;
+  font-size: 13px;
+  font-weight: 500;
+  animation: pulse 2s infinite;
+}
+
 /* ===== QUOTA BAR ===== */
 .quota-bar {
+  background: rgba(30, 41, 59, 0.6);
+  border-bottom: 1px solid rgba(148, 163, 184, 0.08);
+}
+
+.quota-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 6px 16px;
+  background: none;
+  border: none;
+  color: var(--text-dim);
+  font-size: 12px;
+  font-family: inherit;
+  cursor: pointer;
+}
+
+.quota-toggle-arrow {
+  font-size: 10px;
+  transition: transform 0.2s;
+}
+
+.quota-bar.collapsed .quota-toggle-arrow {
+  transform: rotate(-90deg);
+}
+
+.quota-details {
   display: flex;
   align-items: center;
   gap: 16px;
-  padding: 8px 16px;
-  background: rgba(30, 41, 59, 0.6);
-  border-bottom: 1px solid rgba(148, 163, 184, 0.08);
+  padding: 0 16px 8px;
   flex-wrap: wrap;
+  transition: max-height 0.25s ease, opacity 0.2s ease;
+  max-height: 120px;
+  opacity: 1;
+  overflow: hidden;
+}
+
+.quota-bar.collapsed .quota-details {
+  max-height: 0;
+  opacity: 0;
+  padding-bottom: 0;
 }
 
 .quota-item {

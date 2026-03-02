@@ -97,6 +97,30 @@ export function initApp() {
         showScreen('role-screen');
     });
 
+    $('#btn-export-history').addEventListener('click', () => {
+        const entries = getHistory();
+        if (entries.length === 0) {
+            showToast('沒有紀錄可匯出');
+            return;
+        }
+        const BOM = '\uFEFF';
+        const header = '時間,角色,原文,譯文\n';
+        const rows = entries.map((e) => {
+            const time = formatTime(e.timestamp);
+            const role = e.role === 'supervisor' ? '主管' : '員工';
+            const esc = (s) => `"${(s || '').replace(/"/g, '""')}"`;
+            return `${esc(time)},${esc(role)},${esc(e.original)},${esc(e.translated)}`;
+        }).join('\n');
+        const blob = new Blob([BOM + header + rows], { type: 'text/csv;charset=utf-8' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `翻譯紀錄_${new Date().toISOString().slice(0, 10)}.csv`;
+        a.click();
+        URL.revokeObjectURL(url);
+        showToast('已匯出 CSV');
+    });
+
     $('#btn-clear-history').addEventListener('click', () => {
         if (confirm('確定要清除所有翻譯紀錄？\nล้างประวัติทั้งหมด?')) {
             clearHistory();
@@ -107,6 +131,37 @@ export function initApp() {
 
     $('#history-search-input').addEventListener('input', (e) => {
         renderHistory(e.target.value.trim());
+    });
+
+    // ===== THEME TOGGLE =====
+    const themeBtn = $('#btn-theme');
+    function applyTheme(light) {
+        document.body.classList.toggle('light', light);
+        themeBtn.textContent = light ? '🌙 切換深色模式' : '☀️ 切換淺色模式';
+        localStorage.setItem('theme', light ? 'light' : 'dark');
+    }
+    // Restore saved theme
+    applyTheme(localStorage.getItem('theme') === 'light');
+    themeBtn.addEventListener('click', () => {
+        applyTheme(!document.body.classList.contains('light'));
+    });
+
+    // ===== OFFLINE DETECTION =====
+    function updateOnlineStatus() {
+        const banner = $('#offline-banner');
+        if (!navigator.onLine) {
+            banner.style.display = '';
+        } else {
+            banner.style.display = 'none';
+        }
+    }
+    window.addEventListener('online', updateOnlineStatus);
+    window.addEventListener('offline', updateOnlineStatus);
+    updateOnlineStatus();
+
+    // ===== QUOTA TOGGLE =====
+    $('#btn-toggle-quota').addEventListener('click', () => {
+        $('#quota-bar').classList.toggle('collapsed');
     });
 
     // ===== RESET QUOTA =====
@@ -228,6 +283,14 @@ function updateQuotaUI() {
     rpdFill.className = `quota-fill${rpdPct <= 10 ? ' danger' : rpdPct <= 30 ? ' warn' : ''}`;
     $('#rpd-text').textContent = `${q.rpd.remaining}/${q.rpd.max}`;
 
+    // Summary (shown when collapsed)
+    const summary = $('#quota-summary');
+    if (rpdPct <= 10) {
+        summary.textContent = `⚠️ 今日剩 ${q.rpd.remaining} 次`;
+    } else {
+        summary.textContent = `📊 今日 ${q.rpd.remaining}/${q.rpd.max}`;
+    }
+
     // Cooldown
     const cdEl = $('#quota-cooldown');
     const cdText = $('#cooldown-text');
@@ -335,7 +398,7 @@ async function beginRecording() {
     } catch (err) {
         hideLoading();
         console.error('Translation error:', err);
-        showToast(err.message || '發生錯誤');
+        showToast(simplifyError(err.message));
     } finally {
         isRecording = false;
         setRecordingUI(false);
@@ -387,10 +450,28 @@ async function translateText(text) {
     } catch (err) {
         hideLoading();
         console.error('Translation error:', err);
-        showToast(err.message || '發生錯誤');
+        showToast(simplifyError(err.message));
     } finally {
         updateQuotaUI();
     }
+}
+
+// ===== ERROR SIMPLIFICATION =====
+function simplifyError(msg) {
+    if (!msg) return '翻譯失敗，請再試一次';
+    if (msg.includes('限流') || msg.includes('429') || msg.includes('quota'))
+        return '翻譯太頻繁，請稍等幾秒再試';
+    if (msg.includes('403') || msg.includes('無效') || msg.includes('過期'))
+        return 'API Key 有問題，請聯繫管理員';
+    if (msg.includes('API Key'))
+        return '尚未設定 API Key';
+    if (msg.includes('格式錯誤') || msg.includes('JSON'))
+        return '翻譯失敗，請再試一次';
+    if (msg.includes('沒有回傳'))
+        return '翻譯失敗，請再試一次';
+    if (msg.includes('Failed to fetch') || msg.includes('NetworkError'))
+        return '網路連線失敗，請檢查網路';
+    return '翻譯失敗，請再試一次';
 }
 
 // ===== QUICK PHRASES =====

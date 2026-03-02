@@ -42,6 +42,9 @@
     <button id="btn-history" class="history-btn">
       📋 翻譯紀錄 / ประวัติ
     </button>
+    <button id="btn-theme" class="history-btn" style="margin-top:8px">
+      ☀️ 切換淺色模式
+    </button>
   </div>
 
   <!-- 歷史紀錄畫面 -->
@@ -54,6 +57,12 @@
         </svg>
       </button>
       <div class="mode-label">📋 翻譯紀錄</div>
+      <button id="btn-export-history" class="icon-btn" aria-label="匯出" title="匯出 CSV">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+          stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3" />
+        </svg>
+      </button>
       <button id="btn-clear-history" class="icon-btn" aria-label="清除" title="清除所有紀錄">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
           stroke-linecap="round" stroke-linejoin="round">
@@ -85,26 +94,37 @@
       <div style="width:40px"></div>
     </header>
 
-    <!-- 額度顯示 -->
-    <div id="quota-bar" class="quota-bar">
-      <div class="quota-item">
-        <span class="quota-label">每分鐘</span>
-        <div class="quota-meter">
-          <div id="rpm-fill" class="quota-fill"></div>
+    <!-- 離線提示 -->
+    <div id="offline-banner" class="offline-banner" style="display:none">
+      ⚡ 網路已斷線，翻譯功能暫時無法使用
+    </div>
+
+    <!-- 額度顯示（可收合） -->
+    <div id="quota-bar" class="quota-bar collapsed">
+      <button id="btn-toggle-quota" class="quota-toggle">
+        <span id="quota-summary">📊 250/250</span>
+        <span class="quota-toggle-arrow">▼</span>
+      </button>
+      <div class="quota-details">
+        <div class="quota-item">
+          <span class="quota-label">每分鐘</span>
+          <div class="quota-meter">
+            <div id="rpm-fill" class="quota-fill"></div>
+          </div>
+          <span id="rpm-text" class="quota-value">10/10</span>
         </div>
-        <span id="rpm-text" class="quota-value">10/10</span>
-      </div>
-      <div class="quota-item">
-        <span class="quota-label">今日</span>
-        <div class="quota-meter">
-          <div id="rpd-fill" class="quota-fill"></div>
+        <div class="quota-item">
+          <span class="quota-label">今日</span>
+          <div class="quota-meter">
+            <div id="rpd-fill" class="quota-fill"></div>
+          </div>
+          <span id="rpd-text" class="quota-value">250/250</span>
         </div>
-        <span id="rpd-text" class="quota-value">250/250</span>
+        <div id="quota-cooldown" class="quota-cooldown" style="display:none">
+          ⏳ <span id="cooldown-text"></span>
+        </div>
+        <button id="btn-reset-quota" class="reset-quota-btn" title="重置配額計數">重置計數</button>
       </div>
-      <div id="quota-cooldown" class="quota-cooldown" style="display:none">
-        ⏳ <span id="cooldown-text"></span>
-      </div>
-      <button id="btn-reset-quota" class="reset-quota-btn" title="重置配額計數">重置計數</button>
     </div>
 
     <!-- 對話歷史 -->
