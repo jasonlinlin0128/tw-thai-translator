@@ -111,6 +111,13 @@ export function getQuota() {
  * Check if we can make a request (pre-flight check)
  * @returns {{ allowed: boolean, reason?: string }}
  */
+/**
+ * Reset all usage counters
+ */
+export function resetQuota() {
+    localStorage.removeItem(STORAGE_KEY);
+}
+
 export function canRequest() {
     const q = getQuota();
     if (q.rpd.remaining <= 0) {

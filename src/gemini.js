@@ -25,16 +25,16 @@ export function setApiKey(key) {
 /**
  * Fetch with retry + exponential backoff for 429 errors
  */
-async function fetchWithRetry(url, options, maxRetries = 1) {
+async function fetchWithRetry(url, options, maxRetries = 3) {
     for (let attempt = 0; attempt <= maxRetries; attempt++) {
         const response = await fetch(url, options);
 
         if (response.status === 429 && attempt < maxRetries) {
             const body = await response.clone().text();
-            console.warn(`429 rate limit (attempt ${attempt + 1}/${maxRetries}), body:`, body);
+            console.warn(`429 rate limit (attempt ${attempt + 1}/${maxRetries + 1}), body:`, body);
 
             // Try to parse retryDelay from API response
-            let waitMs = 10000; // default 10s
+            let waitMs = 5000 * (attempt + 1); // progressive backoff: 5s, 10s, 15s
             try {
                 const errJson = JSON.parse(body);
                 const retryInfo = errJson.error?.details?.find(
@@ -46,7 +46,7 @@ async function fetchWithRetry(url, options, maxRetries = 1) {
                 }
             } catch { /* use default */ }
 
-            console.warn(`Retrying in ${waitMs}ms`);
+            console.warn(`Retrying in ${waitMs}ms (attempt ${attempt + 2}/${maxRetries + 1})`);
             await new Promise((r) => setTimeout(r, waitMs));
             continue;
         }
@@ -116,7 +116,10 @@ export async function analyzeAndTranslate(text, fromLang, toLang) {
             detail = errBody;
         }
         if (response.status === 429) {
-            throw new Error(`API 限流: ${detail}`);
+            throw new Error(`API 限流（已重試 ${maxRetries} 次仍失敗）：伺服器拒絕請求，可能是 API Key 額度已用盡或被多人共用。建議等幾分鐘或更換 API Key。`);
+        }
+        if (response.status === 403) {
+            throw new Error('API Key 無效或已過期，請到設定更換 API Key');
         }
         throw new Error(`Gemini API 錯誤 (${response.status}): ${detail}`);
     }
@@ -174,6 +177,12 @@ export async function translateClarified(clarifiedText, fromLang, toLang) {
             detail = errJson.error?.message || errBody;
         } catch {
             detail = errBody;
+        }
+        if (response.status === 429) {
+            throw new Error('API 限流：伺服器拒絕請求，請稍後再試或更換 API Key');
+        }
+        if (response.status === 403) {
+            throw new Error('API Key 無效或已過期，請到設定更換 API Key');
         }
         throw new Error(`翻譯失敗: ${detail}`);
     }

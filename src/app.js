@@ -25,7 +25,7 @@ import {
     setRecordStatus,
     showToast,
 } from './ui.js';
-import { recordRequest, getQuota, canRequest } from './quota.js';
+import { recordRequest, getQuota, canRequest, resetQuota } from './quota.js';
 import { saveEntry, getHistory, clearHistory, formatTime } from './history.js';
 
 let currentRole = null; // 'supervisor' | 'worker'
@@ -93,6 +93,13 @@ export function initApp() {
 
     $('#history-search-input').addEventListener('input', (e) => {
         renderHistory(e.target.value.trim());
+    });
+
+    // ===== RESET QUOTA =====
+    $('#btn-reset-quota').addEventListener('click', () => {
+        resetQuota();
+        updateQuotaUI();
+        showToast('配額計數已重置');
     });
 
     // ===== ROLE SELECTION =====
