@@ -27,6 +27,7 @@ import {
 } from './ui.js';
 import { recordRequest, getQuota, canRequest, resetQuota } from './quota.js';
 import { saveEntry, getHistory, clearHistory, formatTime } from './history.js';
+import { logTranslation, getSheetUrl, setSheetUrl } from './logger.js';
 
 let currentRole = null; // 'supervisor' | 'worker'
 let fromLang = 'zh-TW';
@@ -131,6 +132,43 @@ export function initApp() {
 
     $('#history-search-input').addEventListener('input', (e) => {
         renderHistory(e.target.value.trim());
+    });
+
+    // ===== GOOGLE SHEETS SETTING =====
+    const sheetDialog = $('#sheet-dialog');
+    const sheetUrlInput = $('#sheet-url-input');
+    const sheetStatus = $('#sheet-status');
+
+    // Show saved URL if exists
+    sheetUrlInput.value = getSheetUrl();
+
+    $('#btn-sheet-setting').addEventListener('click', () => {
+        sheetUrlInput.value = getSheetUrl();
+        sheetStatus.textContent = getSheetUrl() ? '✅ 已設定，資料收集中' : '';
+        sheetDialog.style.display = 'flex';
+    });
+
+    $('#btn-sheet-cancel').addEventListener('click', () => {
+        sheetDialog.style.display = 'none';
+    });
+
+    $('#btn-sheet-save').addEventListener('click', () => {
+        const url = sheetUrlInput.value.trim();
+        if (url && !url.startsWith('https://script.google.com/')) {
+            sheetStatus.textContent = '❌ 網址格式不正確，應以 https://script.google.com/ 開頭';
+            sheetStatus.style.color = '#ef4444';
+            return;
+        }
+        setSheetUrl(url);
+        sheetStatus.style.color = '';
+        if (url) {
+            sheetStatus.textContent = '✅ 已儲存，翻譯紀錄將自動上傳';
+            showToast('資料收集已啟用');
+        } else {
+            sheetStatus.textContent = '已關閉資料收集';
+            showToast('資料收集已關閉');
+        }
+        setTimeout(() => { sheetDialog.style.display = 'none'; }, 1500);
     });
 
     // ===== THEME TOGGLE =====
@@ -390,10 +428,12 @@ async function beginRecording() {
 
             addTranslationBubble(translation.translated, toLang, translation.note);
             saveEntry({ role: currentRole, original: selectedValue, translated: translation.translated, fromLang, toLang, note: translation.note });
+            logTranslation({ role: currentRole, original: selectedValue, translated: translation.translated, fromLang, toLang, type: 'clarify', note: translation.note });
         } else {
             // Direct translation
             addTranslationBubble(result.translated, toLang, result.note);
             saveEntry({ role: currentRole, original: text, translated: result.translated, fromLang, toLang, note: result.note });
+            logTranslation({ role: currentRole, original: text, translated: result.translated, fromLang, toLang, type: 'translate', note: result.note });
         }
     } catch (err) {
         hideLoading();
@@ -443,9 +483,11 @@ async function translateText(text) {
 
             addTranslationBubble(translation.translated, toLang, translation.note);
             saveEntry({ role: currentRole, original: selectedValue, translated: translation.translated, fromLang, toLang, note: translation.note });
+            logTranslation({ role: currentRole, original: selectedValue, translated: translation.translated, fromLang, toLang, type: 'clarify', note: translation.note });
         } else {
             addTranslationBubble(result.translated, toLang, result.note);
             saveEntry({ role: currentRole, original: text, translated: result.translated, fromLang, toLang, note: result.note });
+            logTranslation({ role: currentRole, original: text, translated: result.translated, fromLang, toLang, type: 'translate', note: result.note });
         }
     } catch (err) {
         hideLoading();

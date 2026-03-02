@@ -385,6 +385,31 @@ body {
   background: rgba(255, 255, 255, 0.1);
 }
 
+/* Google Sheets dialog */
+.sheet-dialog {
+  display: flex;
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  background: rgba(0, 0, 0, 0.6);
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.sheet-dialog-content {
+  background: var(--bg-card);
+  border-radius: var(--radius);
+  padding: 24px;
+  max-width: 400px;
+  width: 100%;
+  color: var(--text);
+}
+
+.sheet-dialog-content h3 {
+  margin-bottom: 4px;
+}
+
 @keyframes pulse {
 
   0%,

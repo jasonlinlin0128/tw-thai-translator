@@ -45,6 +45,23 @@
     <button id="btn-theme" class="history-btn" style="margin-top:8px">
       ☀️ 切換淺色模式
     </button>
+    <button id="btn-sheet-setting" class="history-btn" style="margin-top:8px">
+      📊 資料收集設定
+    </button>
+
+    <!-- Google Sheets 設定對話框 -->
+    <div id="sheet-dialog" class="sheet-dialog" style="display:none">
+      <div class="sheet-dialog-content">
+        <h3>📊 資料收集設定</h3>
+        <p style="font-size:13px;opacity:0.8;margin:8px 0">將翻譯紀錄自動傳送至 Google Sheets，用於後續數據分析。</p>
+        <input id="sheet-url-input" type="url" class="text-input-field" placeholder="貼上 Google Apps Script 網址..." style="margin:12px 0" />
+        <div style="display:flex;gap:8px">
+          <button id="btn-sheet-save" class="history-btn" style="flex:1">💾 儲存</button>
+          <button id="btn-sheet-cancel" class="history-btn" style="flex:1">取消</button>
+        </div>
+        <div id="sheet-status" style="font-size:12px;margin-top:8px;text-align:center"></div>
+      </div>
+    </div>
   </div>
 
   <!-- 歷史紀錄畫面 -->
