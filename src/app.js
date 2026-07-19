@@ -168,7 +168,7 @@ export function initApp() {
   $("#history-list").addEventListener("click", (e) => {
     const playBtn = e.target.closest(".hist-play-zh, .hist-play-th");
     if (!playBtn || !e.currentTarget.contains(playBtn)) return;
-    const entry = getHistory()[Number(playBtn.dataset.idx)];
+    const entry = getHistory().find((h) => h.id === playBtn.dataset.id);
     if (!entry) return;
 
     const playZh = playBtn.classList.contains("hist-play-zh");
@@ -339,7 +339,7 @@ function presentTranslation(original, result, fromLang, toLang) {
 }
 
 function handleTranslateError(err) {
-  const msg = err.message || "";
+  const msg = err?.message || "";
   if (msg === QUOTA_EXHAUSTED_MSG) {
     showToast(msg, 4000);
     openPhrasebook(); // 額度沒了 → 引導用常用句
@@ -617,7 +617,6 @@ function initOffline() {
 function renderHistory(search = "") {
   const list = $("#history-list");
   let entries = getHistory();
-  const all = entries;
 
   if (search) {
     const q = search.toLowerCase();
@@ -641,9 +640,8 @@ function renderHistory(search = "") {
   list.innerHTML = entries
     .map((e) => {
       const isZh = e.fromLang === "zh-TW";
-      const idx = all.indexOf(e);
       return `
-        <div class="history-entry" data-idx="${idx}">
+        <div class="history-entry">
           <div class="history-meta">
             <span class="history-role ${isZh ? "zh" : "th"}">${isZh ? "中文" : "ไทย"}</span>
             <span>${formatTime(e.timestamp)}</span>
@@ -652,7 +650,7 @@ function renderHistory(search = "") {
           <div class="history-translated">${escapeHtml(e.translated)}</div>
           ${e.note ? `<div class="history-note">${escapeHtml(e.note)}</div>` : ""}
           <div class="history-actions">
-            <button class="hist-play-zh" data-idx="${idx}" type="button">
+            <button class="hist-play-zh" data-id="${e.id}" type="button">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                 stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                 <path d="M11 5 6 9H2v6h4l5 4V5z" />
@@ -661,7 +659,7 @@ function renderHistory(search = "") {
               </svg>
               <span>中文</span>
             </button>
-            <button class="hist-play-th" data-idx="${idx}" type="button">
+            <button class="hist-play-th" data-id="${e.id}" type="button">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                 stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                 <path d="M11 5 6 9H2v6h4l5 4V5z" />
