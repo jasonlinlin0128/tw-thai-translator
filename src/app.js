@@ -164,12 +164,22 @@ export function initApp() {
       showToast("紀錄已清除");
     }
   });
-  // 點紀錄重播
+  // 紀錄雙語重播
   $("#history-list").addEventListener("click", (e) => {
-    const el = e.target.closest(".history-entry");
-    if (!el) return;
-    const entry = getHistory()[Number(el.dataset.idx)];
-    if (entry) speak(entry.translated, entry.toLang, gender);
+    const playBtn = e.target.closest(".hist-play-zh, .hist-play-th");
+    if (!playBtn || !e.currentTarget.contains(playBtn)) return;
+    const entry = getHistory()[Number(playBtn.dataset.idx)];
+    if (!entry) return;
+
+    const playZh = playBtn.classList.contains("hist-play-zh");
+    const text = playZh
+      ? entry.fromLang === "zh-TW"
+        ? entry.original
+        : entry.translated
+      : entry.fromLang === "zh-TW"
+        ? entry.translated
+        : entry.original;
+    speak(text, playZh ? "zh-TW" : "th-TH", gender);
   });
 
   initSettings();
@@ -336,13 +346,14 @@ function handleTranslateError(err) {
     return;
   }
   if (msg.includes("限流") || msg.includes("429"))
-    return showToast("翻譯太頻繁，請稍等幾秒再試");
+    return showToast("翻譯太頻繁，請稍等幾秒再試", 3000, true);
   if (msg.toLowerCase().includes("api key"))
-    return showToast("API Key 有問題，請聯繫管理員");
-  if (msg.includes("後端")) return showToast(`${msg}，請再試一次`);
+    return showToast("API Key 有問題，請聯繫管理員", 3000, true);
+  if (msg.includes("後端"))
+    return showToast(`${msg}，請再試一次`, 3000, true);
   if (msg.includes("Failed to fetch") || msg.includes("NetworkError"))
-    return showToast("網路連線失敗，請檢查網路");
-  showToast("翻譯失敗，請再試一次");
+    return showToast("網路連線失敗，請檢查網路", 3000, true);
+  showToast("翻譯失敗，請再試一次", 3000, true);
 }
 
 // ===== 常用句 =====
@@ -521,14 +532,15 @@ function initSettings() {
 
   // 主題
   const themeBtn = $("#btn-theme");
-  const applyTheme = (light) => {
-    document.body.classList.toggle("light", light);
-    themeBtn.textContent = light ? "🌙 切換深色模式" : "☀️ 切換淺色模式";
-    localStorage.setItem("theme", light ? "light" : "dark");
+  const applyTheme = (dark) => {
+    if (dark) document.documentElement.setAttribute("data-theme", "dark");
+    else document.documentElement.removeAttribute("data-theme");
+    themeBtn.textContent = dark ? "☀️ 切換淺色模式" : "🌙 切換深色模式";
+    localStorage.setItem("theme", dark ? "dark" : "light");
   };
-  applyTheme(localStorage.getItem("theme") === "light");
+  applyTheme(localStorage.getItem("theme") === "dark");
   themeBtn.addEventListener("click", () =>
-    applyTheme(!document.body.classList.contains("light")),
+    applyTheme(document.documentElement.dataset.theme !== "dark"),
   );
 
   // 後端網址（僅存手動覆蓋；空值 = 用 build 內建）
@@ -629,15 +641,36 @@ function renderHistory(search = "") {
   list.innerHTML = entries
     .map((e) => {
       const isZh = e.fromLang === "zh-TW";
+      const idx = all.indexOf(e);
       return `
-        <div class="history-entry" data-idx="${all.indexOf(e)}">
+        <div class="history-entry" data-idx="${idx}">
           <div class="history-meta">
             <span class="history-role ${isZh ? "zh" : "th"}">${isZh ? "中文" : "ไทย"}</span>
-            <span>${formatTime(e.timestamp)} · 點擊重播 🔊</span>
+            <span>${formatTime(e.timestamp)}</span>
           </div>
           <div class="history-original">${escapeHtml(e.original)}</div>
           <div class="history-translated">${escapeHtml(e.translated)}</div>
           ${e.note ? `<div class="history-note">${escapeHtml(e.note)}</div>` : ""}
+          <div class="history-actions">
+            <button class="hist-play-zh" data-idx="${idx}" type="button">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M11 5 6 9H2v6h4l5 4V5z" />
+                <path d="M15.54 8.46a5 5 0 0 1 0 7.07" />
+                <path d="M19.07 4.93a10 10 0 0 1 0 14.14" />
+              </svg>
+              <span>中文</span>
+            </button>
+            <button class="hist-play-th" data-idx="${idx}" type="button">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M11 5 6 9H2v6h4l5 4V5z" />
+                <path d="M15.54 8.46a5 5 0 0 1 0 7.07" />
+                <path d="M19.07 4.93a10 10 0 0 1 0 14.14" />
+              </svg>
+              <span>ไทย</span>
+            </button>
+          </div>
         </div>
       `;
     })

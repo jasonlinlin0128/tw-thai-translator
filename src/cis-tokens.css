@@ -1,0 +1,173 @@
+/* Vendored from simhope-map/SH-CIS-for-system-dev core/tokens.css v2 @ 2026-07-19 — 勿手改，更新請重新同步 */
+/* =============================================================================
+   SIMHOPE Design System — Design Tokens (core, zero-dependency)  v2
+   -----------------------------------------------------------------------------
+   單一事實來源。所有子系統的顏色/間距/字級/圓角一律引用這裡的變數，
+   禁止在各專案硬寫 hex 或魔術數字。
+
+   v2 質感升級（結合 impeccable 設計原則）：
+     • 色彩改用 OKLCH；中性色微染品牌藍調（hue≈265），不再是純黑/純灰。
+     • 字體改 IBM Plex Sans + Noto Sans TC（非 Inter），數字用 IBM Plex Mono。
+     • 移除 side-stripe 彩色邊條：側欄/nav active 改「填色圓角」。
+     • 補 ease-out 指數曲線 motion token 與語意化 z-index。
+   （每個 oklch() 後方註解為等價 sRGB hex，供工具與快速辨識。）
+
+   色彩用量原則（黑白極簡 60/30/10）：~90% 中性、~8% 主色藍、~2% 輔助綠。
+   ============================================================================= */
+
+:root {
+  /* ── Brand 色（identity 固定，不更動色相） ──────────────────────────── */
+  --brand-blue:        oklch(0.324 0.212 264.2); /* #000E9D 主色 */
+  --brand-blue-hover:  oklch(0.272 0.175 264.2); /* #000B7A hover/pressed */
+  --brand-blue-soft:   oklch(0.930 0.030 264);   /* #DEE8FD 白底 active/選取列 */
+  --brand-green:       oklch(0.797 0.212 129.1); /* #91D500 輔助（配近黑字） */
+  --brand-green-soft:  oklch(0.950 0.050 129);   /* #E4F6D2 */
+
+  /* ── Neutral（微染藍調的中性骨幹，取代純黑/純灰） ─────────────────── */
+  --ink:               oklch(0.240 0.030 265);   /* #181F2E 主文字 */
+  --ink-soft:          oklch(0.460 0.028 265);   /* #505868 次要文字 */
+  --ink-faint:         oklch(0.560 0.022 265);   /* #6E7582 提示/停用/placeholder（達 AA 4.5:1） */
+  --bg:                oklch(1 0 0);             /* #FFFFFF 頁面/卡片底 */
+  --bg-subtle:         oklch(0.985 0.004 265);   /* #F9FAFD 區塊/表頭底 */
+  --bg-hover:          oklch(0.965 0.006 265);   /* #F1F3F8 hover 列 */
+  --border:            oklch(0.922 0.010 265);   /* #E2E5EC 預設邊框 */
+  --border-strong:     oklch(0.860 0.012 265);   /* #CDD1D9 明顯分隔線 */
+
+  /* ── Sidebar（深色，語意獨立；active = 填色圓角，非左邊條） ────────── */
+  --sidebar-bg:        oklch(0.190 0.028 265);   /* #0E1420 */
+  --sidebar-fg:        oklch(0.860 0.010 265);   /* #CED1D8 */
+  --sidebar-fg-faint:  oklch(0.640 0.015 265);   /* #888C96 群組標題/次要 */
+  --sidebar-hover-bg:  oklch(0.260 0.028 265);   /* #1D2432 */
+  --sidebar-active-bg: oklch(0.300 0.045 265);   /* #232D45 active 填色 */
+  --sidebar-active-fg: oklch(0.985 0.004 265);   /* #F9FAFD active 文字 */
+  --sidebar-border:    oklch(0.280 0.020 265);   /* #242933 */
+
+  /* 白底 nav 的 active（tab/麵包屑/白底選單）— 填色，非左邊條 */
+  --nav-active-bg:     var(--brand-blue-soft);
+  --nav-active-fg:     var(--brand-blue);
+
+  /* ── Semantic 狀態燈號（success 拆兩支解決對比；soft 底皆過 AA） ───── */
+  --status-success:        oklch(0.797 0.212 129.1); /* #91D500 大面積達標底 */
+  --status-success-strong: oklch(0.532 0.140 131.6); /* #4D7C0F 細線/圖示/文字 */
+  --status-success-soft:   oklch(0.968 0.045 129);   /* #EBFBDB badge 底 */
+  --status-warning:        oklch(0.769 0.165 70.1);  /* #F59E0B */
+  --status-warning-strong: oklch(0.555 0.145 49);    /* #B45309 */
+  --status-warning-soft:   oklch(0.980 0.038 78);    /* #FFF6DD */
+  --status-danger:         oklch(0.637 0.208 25.3);  /* #EF4444 */
+  --status-danger-strong:  oklch(0.505 0.190 27.5);  /* #B91C1C */
+  --status-danger-soft:    oklch(0.950 0.040 25);    /* #FFE5E1 */
+  --status-neutral:        oklch(0.714 0.019 261.3); /* #9CA3AF */
+  --status-neutral-soft:   oklch(0.960 0.004 265);   /* #F0F2F4 */
+  --status-info:           var(--brand-blue);
+  --status-info-soft:      var(--brand-blue-soft);   /* #DEE8FD */
+
+  /* ── Typography ─────────────────────────────────────────────────────── */
+  --font-sans: "IBM Plex Sans", "Noto Sans TC", "Microsoft JhengHei", "PingFang TC", system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+
+  --fs-h1:      28px;
+  --fs-h2:      22px;
+  --fs-h3:      18px;
+  --fs-body:    14px;
+  --fs-caption: 12px;
+  --fs-label:   11px;
+
+  --fw-regular:  400;
+  --fw-medium:   500;
+  --fw-semibold: 600;
+
+  --lh-tight:  1.25;
+  --lh-normal: 1.5;
+
+  --tracking-tight:  -0.02em; /* 大標題收緊（impeccable 下限 -0.04em，取安全值） */
+  --tracking-normal:  0;
+
+  /* ── Spacing（4pt scale） ───────────────────────────────────────────── */
+  --space-1: 4px;  --space-2: 8px;  --space-3: 12px; --space-4: 16px;
+  --space-5: 24px; --space-6: 32px; --space-8: 48px; --space-10: 64px;
+
+  /* ── Radius ─────────────────────────────────────────────────────────── */
+  --radius-sm:  4px; --radius-md:  6px; --radius-lg:  8px; --radius-pill: 999px;
+
+  /* ── Shadow（克制；色調帶 ink 藍調，優先用邊框建立層次） ──────────── */
+  --shadow-sm:      0 1px 2px oklch(0.24 0.03 265 / .06);
+  --shadow-md:      0 4px 14px oklch(0.24 0.03 265 / .08);
+  --shadow-overlay: 0 12px 32px oklch(0.24 0.03 265 / .14);
+
+  /* ── Layout / Density ───────────────────────────────────────────────── */
+  --sidebar-w:           200px;  /* 展開寬（fallback）；殼層 JS 依最長選單標籤自動套用 min–max 間的貼合寬 */
+  --sidebar-w-min:       152px;  /* 自動貼合下限（約 4 字標題佔 3/4 寬） */
+  --sidebar-w-max:       264px;  /* 自動貼合上限（超長標題封頂，避免過寬） */
+  --sidebar-w-collapsed: 64px;
+  --settings-nav-w:      360px;
+  --header-h:            56px;
+  --content-pad:         32px;  /* 桌機；平板/手機由媒體查詢覆寫 */
+  --control-h:           36px;  /* 按鈕/輸入框標準高（緊湊密度） */
+  --content-max:         1280px;
+
+  /* ── Breakpoint（供 JS 讀取；CSS 內請直接寫數值） ─────────────────── */
+  --bp-md: 768px; --bp-lg: 1024px;
+
+  /* ── z-index（語意分層：sticky < dropdown < modal < toast < tooltip） ── */
+  --z-base:          0;
+  --z-sidebar:       90;
+  --z-header:        100;   /* sticky */
+  --z-dropdown:      1000;
+  --z-modal-backdrop:1190;
+  --z-modal:         1200;
+  --z-toast:         1300;
+  --z-tooltip:       1400;
+
+  /* ── Motion（ease-out 指數曲線；無 bounce/elastic） ───────────────── */
+  --ease-out-quart: cubic-bezier(0.25, 1, 0.5, 1);
+  --ease-out-expo:  cubic-bezier(0.16, 1, 0.3, 1);
+  --ease:           var(--ease-out-quart);
+  --motion-fast: 120ms; --motion-base: 200ms; --motion-slow: 320ms;
+
+  /* ── Focus ring（鍵盤可見） ─────────────────────────────────────────── */
+  --focus-ring: 0 0 0 3px oklch(0.324 0.212 264.2 / .35);
+}
+
+/* 密度：內容 padding 隨螢幕縮小 */
+@media (max-width: 1024px) { :root { --content-pad: 18px; } }
+@media (max-width: 768px)  { :root { --content-pad: 12px; } }
+
+/* 全域 reduced-motion：所有動畫退化為近乎即時（impeccable 要求，非選配） */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* =============================================================================
+   深色模式（骨架；本期不強制每案啟用）
+   啟用：在 <html>/<body> 加 data-theme="dark"。僅覆寫中性面與白底 nav；
+   品牌藍/綠/狀態色維持一致識別。中性面同樣微染 hue 265。
+   ============================================================================= */
+[data-theme="dark"] {
+  --ink:           oklch(0.94 0.01 265);  /* 近白帶冷調 */
+  --ink-soft:      oklch(0.72 0.02 265);
+  --ink-faint:     oklch(0.56 0.02 265);
+  --bg:            oklch(0.17 0.02 265);
+  --bg-subtle:     oklch(0.21 0.02 265);
+  --bg-hover:      oklch(0.25 0.025 265);
+  --border:        oklch(0.30 0.02 265);
+  --border-strong: oklch(0.38 0.02 265);
+
+  --brand-blue-soft: oklch(0.34 0.09 264);
+  --nav-active-bg:   oklch(0.34 0.09 264);
+  --nav-active-fg:   oklch(0.86 0.10 264);
+
+  --status-success-soft: oklch(0.30 0.06 129);
+  --status-warning-soft: oklch(0.30 0.06 70);
+  --status-danger-soft:  oklch(0.30 0.06 25);
+  --status-neutral-soft: oklch(0.26 0.01 265);
+  --status-info-soft:    oklch(0.34 0.09 264);
+
+  --shadow-sm:      0 1px 2px oklch(0 0 0 / .4);
+  --shadow-md:      0 4px 14px oklch(0 0 0 / .5);
+  --shadow-overlay: 0 12px 32px oklch(0 0 0 / .6);
+}

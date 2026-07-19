@@ -185,7 +185,7 @@ export function setRecordStatus(text, isRecording = false) {
 }
 
 /** Show toast message */
-export function showToast(message, duration = 3000) {
+export function showToast(message, duration = 3000, isError = false) {
   let toast = $("#toast");
   if (!toast) {
     toast = document.createElement("div");
@@ -194,6 +194,7 @@ export function showToast(message, duration = 3000) {
     document.body.appendChild(toast);
   }
   toast.textContent = message;
+  toast.classList.toggle("error", isError);
   toast.classList.add("show");
   clearTimeout(toast._timer);
   toast._timer = setTimeout(() => toast.classList.remove("show"), duration);
