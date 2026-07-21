@@ -36,7 +36,7 @@
         </span>
         <span id="quota-chip" class="quota-chip" style="display:none"></span>
       </div>
-      <button id="btn-gender" class="gender-chip" aria-label="泰文語尾">👨 ครับ</button>
+      <button id="btn-gender" class="gender-chip" aria-label="泰文語尾（男 ครับ／女 ค่ะ）" title="泰文語尾 男／女">ครับ</button>
       <button id="btn-history" class="icon-btn" aria-label="翻譯紀錄">
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
           stroke-linecap="round" stroke-linejoin="round">
@@ -48,13 +48,14 @@
     </header>
 
     <div id="offline-banner" class="offline-banner" style="display:none">
-      ⚡ 離線中：常用句仍可使用 / ออฟไลน์ ใช้วลีสำเร็จรูปได้
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h.01"/><path d="M8.5 16.429a5 5 0 0 1 7 0"/><path d="M5 12.859a10 10 0 0 1 5.17-2.69"/><path d="M19 12.859a10 10 0 0 0-2.007-1.523"/><path d="M2 8.82a15 15 0 0 1 4.177-2.643"/><path d="M22 8.82a15 15 0 0 0-11.288-3.764"/><path d="m2 2 20 20"/></svg>
+      <span>離線中：常用句仍可使用 / ออฟไลน์ ใช้วลีสำเร็จรูปได้</span>
     </div>
 
     <!-- 對話區 -->
     <div id="chat-area" class="chat-area">
       <div class="chat-placeholder">
-        <div class="placeholder-icon">🎤</div>
+        <div class="placeholder-icon"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" x2="12" y1="19" y2="22"/></svg></div>
         <p>按住下方按鈕說話<br />或點常用句、輸入文字</p>
         <p class="placeholder-sub">กดปุ่มค้างไว้เพื่อพูด<br />หรือแตะวลีสำเร็จรูป</p>
       </div>
@@ -62,7 +63,7 @@
 
     <!-- 常用句快捷列 -->
     <div class="quick-strip">
-      <button id="btn-phrasebook" class="phrasebook-btn">📖<span>常用句<br />วลี</span></button>
+      <button id="btn-phrasebook" class="phrasebook-btn"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg><span>常用句<br />วลี</span></button>
       <div id="quick-scroll" class="quick-phrases-scroll"></div>
     </div>
 
@@ -83,12 +84,14 @@
     <div id="record-status" class="record-status">按住說話，放開翻譯 / กดค้างเพื่อพูด</div>
     <div class="dual-record">
       <button id="btn-rec-zh" class="rec-btn rec-zh" aria-label="按住說中文">
-        <span class="rec-icon">🎤</span>
-        <span class="rec-label">按住說中文</span>
+        <span class="rec-icon"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" x2="12" y1="19" y2="22"/></svg></span>
+        <span class="rec-label">說中文</span>
+        <span class="rec-hint">按住這裡說話</span>
       </button>
       <button id="btn-rec-th" class="rec-btn rec-th" aria-label="กดค้างพูดไทย">
-        <span class="rec-icon">🎤</span>
-        <span class="rec-label">กดค้างพูดไทย</span>
+        <span class="rec-icon"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" x2="12" y1="19" y2="22"/></svg></span>
+        <span class="rec-label">พูดไทย</span>
+        <span class="rec-hint">กดค้างที่นี่</span>
       </button>
     </div>
   </div>
@@ -103,7 +106,7 @@
           <path d="M19 12H5" />
         </svg>
       </button>
-      <div class="mode-label">📖 常用句 / วลีสำเร็จรูป</div>
+      <div class="mode-label">常用句 / วลีสำเร็จรูป</div>
       <div style="width:40px"></div>
     </header>
     <div id="pb-cats" class="pb-cats"></div>
@@ -148,7 +151,7 @@
     </div>
     <div id="history-list" class="history-list">
       <div class="history-empty">
-        <p>📝 還沒有翻譯紀錄</p>
+        <p>還沒有翻譯紀錄</p>
         <p class="placeholder-sub">ยังไม่มีประวัติ</p>
       </div>
     </div>
@@ -157,15 +160,15 @@
   <!-- 設定對話框 -->
   <div id="settings-dialog" class="sheet-dialog" style="display:none">
     <div class="sheet-dialog-content">
-      <h3>⚙️ 設定 / ตั้งค่า</h3>
-      <button id="btn-theme" class="history-btn">🌙 切換深色模式</button>
-      <button id="btn-mic-permission" class="history-btn" style="display:none">🎤 允許使用麥克風 / อนุญาตไมโครโฟน</button>
-      <button id="btn-reset-quota" class="history-btn">🔄 重置本機額度計數</button>
+      <h3>設定 / ตั้งค่า</h3>
+      <button id="btn-theme" class="history-btn">切換深色模式</button>
+      <button id="btn-mic-permission" class="history-btn" style="display:none">允許使用麥克風 / อนุญาตไมโครโฟน</button>
+      <button id="btn-reset-quota" class="history-btn">重置本機額度計數</button>
       <div class="settings-field">
         <label class="field-label" for="sheet-url-input">後端網址（管理者設定，一般使用者免填）</label>
         <input id="sheet-url-input" type="url" class="text-input-field" placeholder="https://script.google.com/..." />
         <div style="display:flex;gap:8px;margin-top:8px">
-          <button id="btn-sheet-save" class="history-btn" style="flex:1;margin-top:0">💾 儲存</button>
+          <button id="btn-sheet-save" class="history-btn" style="flex:1;margin-top:0">儲存</button>
         </div>
         <div id="sheet-status" style="font-size:12px;margin-top:8px;text-align:center"></div>
       </div>

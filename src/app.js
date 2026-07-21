@@ -33,6 +33,7 @@ import { recordRequest, getQuota, canRequest, resetQuota } from "./quota.js";
 import { saveEntry, getHistory, clearHistory, formatTime } from "./history.js";
 import { logEvent } from "./logger.js";
 import { PHRASES, PHRASE_CATS, GLOSSARY, toFemaleThai } from "./data.js";
+import { icon } from "./icons.js";
 
 const $ = (sel) => document.querySelector(sel);
 
@@ -74,7 +75,7 @@ function addFav(p) {
   const favs = getFavs().filter((f) => favKey(f) !== favKey(p));
   favs.unshift({ zh: p.zh, th: p.th });
   localStorage.setItem(FAV_KEY, JSON.stringify(favs.slice(0, 30)));
-  showToast("⭐ 已收藏，常用句可找到", 1500);
+  showToast("已收藏，常用句可找到", 1500);
   renderQuickStrip();
 }
 
@@ -101,7 +102,7 @@ export function initApp() {
   });
   const genderBtn = $("#btn-gender");
   const renderGender = () => {
-    genderBtn.textContent = gender === "female" ? "👩 ค่ะ" : "👨 ครับ";
+    genderBtn.textContent = gender === "female" ? "ค่ะ" : "ครับ";
   };
   renderGender();
   genderBtn.addEventListener("click", () => {
@@ -223,10 +224,7 @@ async function beginRecording(btn, fromLang) {
   }
   isRecording = true;
   btn.classList.add("recording");
-  setRecordStatus(
-    fromLang === "zh-TW" ? "🔴 正在聆聽..." : "🔴 กำลังฟัง...",
-    true,
-  );
+  setRecordStatus(fromLang === "zh-TW" ? "正在聆聽…" : "กำลังฟัง…", true);
 
   try {
     const text = await startListening(fromLang);
@@ -349,8 +347,7 @@ function handleTranslateError(err) {
     return showToast("翻譯太頻繁，請稍等幾秒再試", 3000, true);
   if (msg.toLowerCase().includes("api key"))
     return showToast("API Key 有問題，請聯繫管理員", 3000, true);
-  if (msg.includes("後端"))
-    return showToast(`${msg}，請再試一次`, 3000, true);
+  if (msg.includes("後端")) return showToast(`${msg}，請再試一次`, 3000, true);
   if (msg.includes("Failed to fetch") || msg.includes("NetworkError"))
     return showToast("網路連線失敗，請檢查網路", 3000, true);
   showToast("翻譯失敗，請再試一次", 3000, true);
@@ -399,7 +396,7 @@ function renderQuickStrip() {
   scroll.innerHTML = items
     .map(
       (p, i) =>
-        `<button class="quick-phrase-btn" data-i="${i}">${p.fav ? "⭐" : ""}${escapeHtml(p.zh)}</button>`,
+        `<button class="quick-phrase-btn" data-i="${i}">${p.fav ? icon("star", 14) : ""}${escapeHtml(p.zh)}</button>`,
     )
     .join("");
   scroll.querySelectorAll(".quick-phrase-btn").forEach((btn) => {
@@ -419,15 +416,15 @@ function openPhrasebook() {
 
 function renderPhrasebookCats() {
   const cats = [
-    { id: "fav", zh: "收藏", th: "รายการโปรด", icon: "⭐" },
+    { id: "fav", zh: "收藏", th: "รายการโปรด" },
     ...PHRASE_CATS,
-    { id: "terms", zh: "術語", th: "ศัพท์เทคนิค", icon: "🔧" },
+    { id: "terms", zh: "術語", th: "ศัพท์เทคนิค" },
   ];
   const el = $("#pb-cats");
   el.innerHTML = cats
     .map(
       (c) =>
-        `<button class="pb-cat-chip ${c.id === currentCat ? "active" : ""}" data-cat="${c.id}">${c.icon} ${c.zh}<span class="pb-cat-th">${c.th}</span></button>`,
+        `<button class="pb-cat-chip ${c.id === currentCat ? "active" : ""}" data-cat="${c.id}">${c.zh}<span class="pb-cat-th">${c.th}</span></button>`,
     )
     .join("");
   el.querySelectorAll(".pb-cat-chip").forEach((chip) => {
@@ -456,7 +453,7 @@ function renderPhrasebook(catId, query) {
   }
 
   if (items.length === 0) {
-    list.innerHTML = `<div class="history-empty"><p>${query ? "找不到 / ไม่พบ" : "還沒有收藏，點翻譯結果的 ⭐ 加入"}</p></div>`;
+    list.innerHTML = `<div class="history-empty"><p>${query ? "找不到 / ไม่พบ" : "還沒有收藏，點翻譯結果的收藏鍵加入"}</p></div>`;
     return;
   }
 
@@ -469,8 +466,8 @@ function renderPhrasebook(catId, query) {
           <div class="pb-th">${escapeHtml(thOut(p.th))}</div>
         </div>
         <div class="pb-actions">
-          <button class="pb-play-zh" data-i="${i}" title="播中文給台籍同仁聽">🔊 中</button>
-          ${p.fav ? `<button class="pb-remove" data-i="${i}" title="移除收藏">✕</button>` : ""}
+          <button class="pb-play-zh" data-i="${i}" title="播中文給台籍同仁聽">${icon("volume")}<span>中</span></button>
+          ${p.fav ? `<button class="pb-remove" data-i="${i}" title="移除收藏" aria-label="移除收藏">${icon("x")}</button>` : ""}
         </div>
       </div>`,
     )
@@ -535,7 +532,7 @@ function initSettings() {
   const applyTheme = (dark) => {
     if (dark) document.documentElement.setAttribute("data-theme", "dark");
     else document.documentElement.removeAttribute("data-theme");
-    themeBtn.textContent = dark ? "☀️ 切換淺色模式" : "🌙 切換深色模式";
+    themeBtn.textContent = dark ? "切換淺色模式" : "切換深色模式";
     localStorage.setItem("theme", dark ? "dark" : "light");
   };
   applyTheme(localStorage.getItem("theme") === "dark");
@@ -547,14 +544,14 @@ function initSettings() {
   $("#btn-sheet-save").addEventListener("click", () => {
     const url = urlInput.value.trim();
     if (url && !url.startsWith("https://script.google.com/")) {
-      status.textContent = "❌ 網址應以 https://script.google.com/ 開頭";
-      status.style.color = "#ef4444";
+      status.textContent = "網址應以 https://script.google.com/ 開頭";
+      status.style.color = "var(--status-danger-strong)";
       return;
     }
     if (url) localStorage.setItem("google_sheet_url", url);
     else localStorage.removeItem("google_sheet_url");
     status.style.color = "";
-    status.textContent = url ? "✅ 已儲存" : "已清除（使用內建設定）";
+    status.textContent = url ? "已儲存" : "已清除（使用內建設定）";
     updateQuotaChip();
   });
 
@@ -584,7 +581,7 @@ function initSettings() {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       stream.getTracks().forEach((t) => t.stop());
       micBtn.style.display = "none";
-      showToast("✅ 麥克風已授權");
+      showToast("麥克風已授權");
     } catch {
       showToast("麥克風授權被拒絕，請在瀏覽器設定中允許");
     }
@@ -592,7 +589,7 @@ function initSettings() {
 
   function openSettingsDialog() {
     urlInput.value = localStorage.getItem("google_sheet_url") || "";
-    status.textContent = getBackendUrl() ? "✅ 後端已連線設定" : "";
+    status.textContent = getBackendUrl() ? "後端已連線設定" : "";
     status.style.color = "";
     checkMicPermission();
     dialog.style.display = "flex";
@@ -630,7 +627,7 @@ function renderHistory(search = "") {
   if (entries.length === 0) {
     list.innerHTML = `
       <div class="history-empty">
-        <p>${search ? "找不到結果" : "📝 還沒有翻譯紀錄"}</p>
+        <p>${search ? "找不到結果" : "還沒有翻譯紀錄"}</p>
         <p class="placeholder-sub">${search ? "ไม่พบผลลัพธ์" : "ยังไม่มีประวัติ"}</p>
       </div>
     `;

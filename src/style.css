@@ -7,7 +7,30 @@
 }
 
 :root {
-  --font-th: "Noto Sans Thai", var(--font-sans);
+  /* 泰文優先 Noto Sans Thai；離線／載入失敗時退系統泰文，
+     不可退回不含泰文字符的 --font-sans（IBM Plex／Noto TC 無泰文字） */
+  --font-th:
+    "Noto Sans Thai", "Leelawadee UI", "Thonburi", "Noto Sans TC", sans-serif;
+}
+
+/* 主題感知前景色 + 泰側柔面：補 CIS 深色層缺口。
+   CIS 深色只重映射了 --brand-blue-soft、沒映射 --brand-green-soft；
+   且 --brand-blue / *-strong 當文字只在白底可讀。此層讓深色不再糊成一團。
+   （深色用亮品牌色當「深底上的文字」是高對比、非 CIS 禁止的白底情境。） */
+:root {
+  --blue-fg: var(--brand-blue);
+  --green-fg: var(--status-success-strong);
+  --danger-fg: var(--status-danger-strong);
+  --th-soft: var(--brand-green-soft);
+}
+
+[data-theme="dark"] {
+  --blue-fg: var(--nav-active-fg);
+  --green-fg: var(--brand-green);
+  --danger-fg: var(--status-danger);
+  /* 用 in oklab（非 oklch）：oklch 會按比例插值色相，74% 權重的藍調 bg
+     會把結果拉成藍灰；oklab 保住綠色方向，只降彩度 */
+  --th-soft: color-mix(in oklab, var(--brand-green) 30%, var(--bg));
 }
 
 html,
@@ -143,7 +166,7 @@ button {
 }
 
 .quota-chip.danger {
-  color: var(--status-danger-strong);
+  color: var(--danger-fg);
   background: var(--status-danger-soft);
 }
 
@@ -177,6 +200,10 @@ button {
 
 /* ===== OFFLINE BANNER ===== */
 .offline-banner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
   padding: var(--space-2) var(--space-4);
   color: var(--status-warning-strong);
   background: var(--status-warning-soft);
@@ -205,9 +232,10 @@ button {
 }
 
 .placeholder-icon {
+  display: flex;
+  justify-content: center;
   margin-bottom: var(--space-4);
-  font-size: var(--fs-h1);
-  opacity: 0.65;
+  color: var(--ink-faint);
 }
 
 .chat-placeholder p {
@@ -262,41 +290,87 @@ button {
   border: 1px solid var(--border);
 }
 
+/* 譯文＝主視覺：柔色卡片（讀者側顏色當訊號）＋近黑字，
+   非實心藍大色塊——守 CIS 90/8/2、且大段泰文更好讀 */
 .target .bubble {
-  color: var(--sidebar-active-fg);
-  background: var(--brand-blue);
-  border: 1px solid var(--brand-blue);
+  color: var(--ink);
+  border: 1px solid var(--border);
+}
+
+.to-zh .bubble {
+  background: var(--brand-blue-soft);
+}
+
+.to-th .bubble {
+  background: var(--th-soft);
 }
 
 .bubble-label {
-  margin-bottom: var(--space-1);
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  margin-bottom: var(--space-2);
   color: var(--ink-soft);
   font-size: var(--fs-label);
   letter-spacing: var(--tracking-normal);
 }
 
-.translation-text {
-  font-size: var(--fs-h1);
-  font-weight: var(--fw-medium);
-  line-height: var(--lh-normal);
+.source .bubble-label {
+  justify-content: flex-end;
 }
 
+/* 語言標籤＝CIS badge（淺底＋strong 字），把說話者／讀者綁定到該側顏色 */
+.lang-tag {
+  padding: 2px var(--space-2);
+  border-radius: var(--radius-pill);
+  font-size: var(--fs-label);
+  font-weight: var(--fw-semibold);
+  line-height: 1.4;
+}
+
+.lang-tag.zh {
+  color: var(--blue-fg);
+  background: var(--brand-blue-soft);
+}
+
+.lang-tag.th {
+  color: var(--green-fg);
+  background: var(--th-soft);
+  font-family: var(--font-th);
+}
+
+.translation-text {
+  font-size: var(--fs-h1);
+  font-weight: var(--fw-semibold);
+  line-height: 1.4;
+  letter-spacing: var(--tracking-tight);
+}
+
+/* 泰文疊聲調符號：H1 需更寬行高＋正常字距，否則上標被切、字元簇被拆 */
 .th-text {
   font-family: var(--font-th);
+  line-height: 1.7;
+  letter-spacing: var(--tracking-normal);
 }
 
 .back-text {
   margin-top: var(--space-2);
   padding-top: var(--space-2);
-  border-top: 1px dashed rgba(255, 255, 255, 0.35);
+  border-top: 1px dashed var(--border-strong);
+  color: var(--ink-soft);
   font-size: var(--fs-caption);
-  opacity: 0.85;
+}
+
+.back-label {
+  margin-right: var(--space-1);
+  color: var(--ink-faint);
+  font-weight: var(--fw-medium);
 }
 
 .note-text {
   margin-top: var(--space-2);
+  color: var(--ink-soft);
   font-size: var(--fs-caption);
-  opacity: 0.8;
 }
 
 .bubble-actions {
@@ -314,7 +388,7 @@ button {
   min-width: 44px;
   min-height: 44px;
   padding: var(--space-2) var(--space-3);
-  color: var(--brand-blue);
+  color: var(--blue-fg);
   background: var(--bg);
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
@@ -414,7 +488,7 @@ button {
 .loading-dots span {
   width: var(--space-2);
   height: var(--space-2);
-  background: var(--brand-blue);
+  background: var(--blue-fg);
   border-radius: var(--radius-pill);
   animation: loadingPulse 1.2s infinite ease-out;
 }
@@ -534,7 +608,7 @@ button {
 
 .text-input-field:focus-visible {
   outline: none;
-  border-color: var(--brand-blue);
+  border-color: var(--blue-fg);
   box-shadow: var(--focus-ring);
 }
 
@@ -569,7 +643,7 @@ button {
 }
 
 .record-status.recording {
-  color: var(--status-danger-strong);
+  color: var(--danger-fg);
   font-weight: var(--fw-semibold);
 }
 
@@ -587,10 +661,10 @@ button {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: var(--space-2);
-  min-height: 88px;
+  gap: var(--space-1);
+  min-height: 96px;
   border: 1px solid transparent;
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-lg);
   cursor: pointer;
   touch-action: none;
   user-select: none;
@@ -601,13 +675,21 @@ button {
 }
 
 .rec-icon {
-  font-size: var(--fs-h2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .rec-label {
-  font-size: var(--fs-h3);
+  font-size: var(--fs-h2);
   font-weight: var(--fw-semibold);
   letter-spacing: var(--tracking-normal);
+}
+
+.rec-hint {
+  font-size: var(--fs-caption);
+  font-weight: var(--fw-regular);
+  opacity: 0.85;
 }
 
 .rec-zh {
@@ -619,8 +701,10 @@ button {
   background: var(--brand-blue-hover);
 }
 
+/* 綠鍵底色固定亮綠（brand-green 不隨主題變），文字必須固定近黑，
+   不可用會翻白的 --ink——用永遠深色的 --sidebar-bg */
 .rec-th {
-  color: var(--ink);
+  color: var(--sidebar-bg);
   background: var(--brand-green);
   font-family: var(--font-th);
 }
@@ -632,7 +716,8 @@ button {
 .rec-btn.recording {
   color: var(--sidebar-active-fg);
   background: var(--status-danger);
-  animation: recPulse calc(var(--motion-slow) * 4) var(--ease) infinite alternate;
+  animation: recPulse calc(var(--motion-slow) * 4) var(--ease) infinite
+    alternate;
 }
 
 @keyframes recPulse {
@@ -722,7 +807,7 @@ button {
 
 .pb-th {
   margin-top: var(--space-1);
-  color: var(--status-success-strong);
+  color: var(--green-fg);
   font-family: var(--font-th);
   font-size: var(--fs-h3);
   line-height: var(--lh-normal);
@@ -736,6 +821,10 @@ button {
 
 .pb-play-zh,
 .pb-remove {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
   min-width: 44px;
   min-height: 44px;
   padding: var(--space-2);
@@ -809,14 +898,14 @@ button {
 
 .history-role.zh,
 .history-role.supervisor {
-  color: var(--brand-blue);
+  color: var(--blue-fg);
   background: var(--brand-blue-soft);
 }
 
 .history-role.th,
 .history-role.worker {
-  color: var(--status-success-strong);
-  background: var(--brand-green-soft);
+  color: var(--green-fg);
+  background: var(--th-soft);
   font-family: var(--font-th);
 }
 
@@ -830,7 +919,7 @@ button {
 }
 
 .history-translated {
-  color: var(--brand-blue);
+  color: var(--blue-fg);
   font-family: var(--font-th);
   font-size: var(--fs-h3);
   line-height: var(--lh-normal);
@@ -956,8 +1045,8 @@ button {
 }
 
 #btn-mic-permission {
-  color: var(--brand-blue);
-  border-color: var(--brand-blue);
+  color: var(--blue-fg);
+  border-color: var(--blue-fg);
 }
 
 /* ===== TOAST ===== */
@@ -1003,4 +1092,16 @@ button {
 .history-list::-webkit-scrollbar-thumb {
   background: var(--border-strong);
   border-radius: var(--radius-pill);
+}
+
+/* ===== lucide 圖示對齊 + 數字用 mono tabular（CIS §3） ===== */
+.ico {
+  display: inline-block;
+  flex-shrink: 0;
+  vertical-align: middle;
+}
+
+.history-meta > span:last-child {
+  font-family: var(--font-mono);
+  font-feature-settings: "tnum";
 }

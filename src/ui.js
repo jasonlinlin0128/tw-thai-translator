@@ -3,6 +3,7 @@
  */
 
 import { speak } from "./speech.js";
+import { icon } from "./icons.js";
 
 const $ = (sel) => document.querySelector(sel);
 
@@ -18,7 +19,7 @@ export function showScreen(id) {
 export function clearChat() {
   $("#chat-area").innerHTML = `
     <div class="chat-placeholder">
-      <div class="placeholder-icon">🎤</div>
+      <div class="placeholder-icon">${icon("mic", 40)}</div>
       <p>按住下方按鈕說話<br/>或點常用句、輸入文字</p>
       <p class="placeholder-sub">กดปุ่มค้างไว้เพื่อพูด<br/>หรือแตะวลีสำเร็จรูป</p>
     </div>
@@ -37,7 +38,7 @@ export function addSourceBubble(text, lang) {
   const div = document.createElement("div");
   div.className = "chat-msg source";
   div.innerHTML = `
-    <div class="bubble-label">🎤 ${lang === "zh-TW" ? "中文" : "ไทย"}</div>
+    <div class="bubble-label"><span class="lang-tag ${lang === "zh-TW" ? "zh" : "th"}">${lang === "zh-TW" ? "中文" : "ไทย"}</span></div>
     <div class="bubble">${escapeHtml(text)}</div>
   `;
   chatArea.appendChild(div);
@@ -57,21 +58,21 @@ export function addTranslationBubble(opts) {
   removePlaceholder();
   const chatArea = $("#chat-area");
   const div = document.createElement("div");
-  div.className = "chat-msg target";
+  div.className = `chat-msg target ${lang === "th-TH" ? "to-th" : "to-zh"}`;
   div.innerHTML = `
-    <div class="bubble-label">${lang === "zh-TW" ? "→ 中文" : "→ ไทย"}</div>
+    <div class="bubble-label">→ <span class="lang-tag ${lang === "th-TH" ? "th" : "zh"}">${lang === "zh-TW" ? "中文" : "ไทย"}</span></div>
     <div class="bubble translation-bubble">
       <div class="translation-text ${lang === "th-TH" ? "th-text" : ""}">${escapeHtml(text)}</div>
-      ${back ? `<div class="back-text">↩ ${escapeHtml(back)}</div>` : ""}
+      ${back ? `<div class="back-text"><span class="back-label">回譯</span> ${escapeHtml(back)}</div>` : ""}
       ${note ? `<div class="note-text">${escapeHtml(note)}</div>` : ""}
       <div class="bubble-actions">
-        <button class="action-btn play-btn">🔊 播放</button>
-        <button class="action-btn copy-btn">📋</button>
-        ${onStar ? `<button class="action-btn star-btn" title="收藏">⭐</button>` : ""}
+        <button class="action-btn play-btn">${icon("volume")}<span>播放</span></button>
+        <button class="action-btn copy-btn" title="複製" aria-label="複製">${icon("copy")}</button>
+        ${onStar ? `<button class="action-btn star-btn" title="收藏" aria-label="收藏">${icon("star")}</button>` : ""}
         ${
           onFeedback
-            ? `<button class="action-btn fb-btn fb-good" title="翻得好">👍</button>
-        <button class="action-btn fb-btn fb-bad" title="翻錯了">👎</button>`
+            ? `<button class="action-btn fb-btn fb-good" title="翻得好" aria-label="翻得好">${icon("thumbUp")}</button>
+        <button class="action-btn fb-btn fb-bad" title="翻錯了" aria-label="翻錯了">${icon("thumbDown")}</button>`
             : ""
         }
       </div>
@@ -150,7 +151,7 @@ export function addClarifyBubble(data) {
           b.style.opacity = "0.5";
         });
         btn.style.opacity = "1";
-        btn.style.border = "2px solid white";
+        btn.style.border = "2px solid var(--blue-fg)";
         resolve(btn.dataset.value);
       });
     });
