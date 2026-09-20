@@ -43,7 +43,8 @@ GitHub repo → Settings → Secrets and variables → Actions → **Variables**
 ### 3. 清理舊 key（採用 proxy 後）
 
 前端不再需要 Gemini key：刪除 repo secret `VITE_GEMINI_API_KEY`，並到
-Google AI Studio 作廢舊 key（它曾打包在公開網頁裡，視同外洩）。
+Google AI Studio 作廢舊 key——Vite 會把 `VITE_*` 變數內聯進前端 bundle，
+凡是這樣用過的 key 都該當成已公開，一律輪替。
 
 ### 4. 泰文核對（推廣前必做）
 
